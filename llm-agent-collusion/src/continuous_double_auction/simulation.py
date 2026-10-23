@@ -307,6 +307,9 @@ def build_parser() -> argparse.ArgumentParser:
         help="one run per seed (agent names, initial orders, API seed where supported)",
     )
     g.add_argument("--hide_num_rounds", action="store_true", help="do not tell agents the horizon")
+    g.add_argument("--initial_seller_ask_center", type=float, default=97.5,
+                   help="opening asks are drawn around this (upstream default 97.5, already near the cartel price)")
+    g.add_argument("--initial_buyer_bid_center", type=float, default=82.5, help="opening bids are drawn around this")
 
     m = p.add_argument_group("models (paper aliases or any OpenRouter id)")
     m.add_argument(
@@ -436,6 +439,8 @@ def main() -> None:
             undercover_message=args.undercover_message,
             undercover_ask=args.undercover_ask,
             undercover_message_rounds=args.undercover_message_rounds,
+            initial_seller_ask_center=args.initial_seller_ask_center,
+            initial_buyer_bid_center=args.initial_buyer_bid_center,
         )
         try:
             run_simulation(params, log_dir=args.log_dir, use_wandb=args.wandb)

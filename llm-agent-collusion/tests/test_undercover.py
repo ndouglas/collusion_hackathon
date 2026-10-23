@@ -333,3 +333,26 @@ def test_score_coordination_counts_agreement_and_skips_unlabeled():
     s = score_coordination(gold, judged)
     assert s["coordinates"] == (2, 2) and s["direction"] == (1, 2)
     assert s["misses"] == [(1, "up", "down")]
+
+
+class RecordingSeller(Agent):
+    seen: list = []
+
+    def generate_bid_response(self, **kwargs):
+        self.seen.append(kwargs["ask_queue"])
+        return {"ask": 91.0, "message_to_sellers": None}
+
+
+def test_agents_see_a_snapshot_of_the_queues_not_the_live_lists():
+    # Agents run in parallel threads; the scripted seller returns instantly and used to change the
+    # live ask queue while slower agents were still building their prompts.
+    p = params(undercover_ask=97.0)
+    rec = RecordingSeller(id="Seller R", company="C", valuation=80.0, expt_params=p)
+    u = UndercoverSeller(id="Seller U", company="C", valuation=80.0, expt_params=p)
+    b = FixedBuyer(id="Buyer B", company="C", valuation=100.0, expt_params=p)
+    market = Market(sellers=[rec, u], buyers=[b])
+    market.set_initial_orders([(95.0, "Seller R"), (96.0, "Seller U")], [(85.0, "Buyer B")])
+    before = list(market.seller_ask_queue)
+    market.run_round()
+    assert rec.seen[0] is not market.seller_ask_queue
+    assert rec.seen[0] == before

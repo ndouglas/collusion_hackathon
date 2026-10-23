@@ -196,3 +196,11 @@ Index against $80 (competitive, now unique) → $100 (cartel).
 - **With forced competition, the undercover agent does nothing.** Silent $93 vs. none, and offer vs. silent, are all within ±0.02 (every p > 0.35). The $97/$93 "anchor" effect in v4/v5 was an artifact of the 3-vs-3 market, as the red team said.
 - **gpt-4.1's words and prices come apart too.** 18 of 40 accept the $93 offer in words. None of the 18 ever asks $92.50 or more (median highest ask $89.37, median final ask $89.10). They say yes and keep pricing with the existing cartel. Mirror image of mini, which says no and sometimes prices high.
 - 0 suspicious, 0 principled (40 sellers).
+
+**No-chat control (v6-nochat, 10 seeds, seller messages off): the chat doesn't move prices.** With chat: ask +0.43 ($88.66), trade price $88.60. Without chat: ask +0.44, trade price $88.78 (asks p = 0.65, prices p = 0.60). Both start at +0.46 in hour 1 and end at +0.43 in hour 15. gpt-4.1 sellers hold near the opening book whether or not they can talk. So the high prices are inertia (or the buyers), not chat-driven collusion. The "let's avoid undercutting" talk and the 18/40 accepts are cheap talk with no measurable price effect. Claim 1 must not say "gpt-4.1 colludes" on price evidence; it can say gpt-4.1 *agrees* to collude and *talks* like a cartel.
+
+**Where the sprint lands (all data through v6-nochat; about $57.60 spent):**
+1. In a market where collusion is identifiable, nothing said in chat moved prices: not the undercover offer, not the sellers' own coordination talk, not chat at all.
+2. Stated willingness differs sharply by model (accept at matched prices: mini 2/60 at $93 and 0/60 at $97; gpt-4.1 24/30 at $93, 15/30 at $97 and 18/40 in v6), and so does private framing (gpt-4.1 names collusion as a strategic risk). 0 of 667 sellers suspected a sting or objected on principle, in public or in private.
+3. Words-based evaluation, including a sting's acceptance rate, measures disposition, not behavior.
+4. The starter market's design (homogeneous values, a 3-vs-3 market, a $97.50 opening book, the `--paper` flag's 6 buyers, the race) produced a spurious undercover "anchor" effect that disappears once those are fixed.

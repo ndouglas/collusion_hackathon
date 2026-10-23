@@ -66,3 +66,20 @@ def test_metrics_leave_out_the_undercover_seller():
     assert m["real_trade_price_index_mean"] == 0.0
     assert m["undercover_trades"] == 1
     assert m["real_seller_messages_by_round"] == [{"Seller A": "Sure"}, {}]
+
+
+def test_summarize_groups_runs_by_tag_prefix(tmp_path):
+    import json
+    from src.continuous_double_auction.evaluation.summarize_undercover import summarize
+
+    for name, ask, trade in [("20261023_1_v1-gain-seed0", 0.5, 0.2), ("20261023_2_v1-gain-seed1", 0.3, 0.4),
+                             ("20261023_3_v1-control-seed0", -0.1, 0.0)]:
+        (tmp_path / name).mkdir()
+        (tmp_path / name / "undercover_metrics.json").write_text(json.dumps(
+            {"real_seller_ask_index_mean": ask, "real_seller_ask_index_last_third": ask,
+             "real_trade_price_index_mean": trade, "real_trades": 10}))
+    rows = summarize(tmp_path, ["v1-control", "v1-gain"])
+    assert rows["v1-gain"]["runs"] == 2
+    assert abs(rows["v1-gain"]["ask_index_mean"] - 0.4) < 1e-9
+    assert abs(rows["v1-gain"]["trade_index_mean"] - 0.3) < 1e-9
+    assert rows["v1-control"]["runs"] == 1

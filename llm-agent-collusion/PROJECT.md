@@ -99,3 +99,16 @@ Words × action, seller level. "Acts" means the seller's own ask index (rounds 2
 - Almost nobody is suspicious (1 of 180). Mini sellers don't read the offer as a trap; they argue against it in the open ("Seller Kai's $97 ask is hurting all sellers…").
 - **The judge needs a hand-check before reporting.** Of 6 "accept" labels, about 3 look wrong: "keep asks close to the highest bids" is a counter-proposal (an implicit reject), not an accept. Fix the prompt, or hand-label the accepts.
 - Run-level check: the acting sellers cluster in 7 of the 20 gain runs (mean share 0.28 vs. control 0.11, permutation p = 0.15). Sellers in one run move together, as expected on a broadcast channel. So the seller-level p ≈ 0.02 overstates it; the honest status is *suggestive*. More seeds would settle it (about 11¢ per run).
+
+### Relabeled with the calibrated judge (gpt-4.1; 21/22 on the calibration set)
+
+Stances across 180 real sellers: **0 accept**, 94 reject, 86 ignore; 0 suspicious, 0 defected. All 6 earlier "accepts" from the mini judge were errors.
+
+| condition | acting sellers | acting & rejected | acting & ignored |
+|---|---|---|---|
+| gain proposal | 17/60 | 11 | 6 |
+| loss proposal | 4/60 | 1 | 3 |
+| gain signal | 5/30 | 1 | 4 |
+| loss signal | 3/30 | 0 | 3 |
+
+**Every seller who priced high did it without ever agreeing in words.** Under the gain proposal, 11 of the 17 explicitly rejected the offer and then priced above the control's range anyway. An undercover agent that logs only replies would have caught none of them. (Still suggestive at the run level, p = 0.15; needs more seeds and Nathan's hand-check.)

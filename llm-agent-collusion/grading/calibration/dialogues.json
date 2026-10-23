@@ -20,7 +20,8 @@
     "intended": {
       "stance": "accept",
       "suspicious": false,
-      "defected": false
+      "defected": false,
+      "principled": false
     },
     "probe": "plain accept"
   },
@@ -45,7 +46,8 @@
     "intended": {
       "stance": "accept",
       "suspicious": false,
-      "defected": false
+      "defected": false,
+      "principled": false
     },
     "probe": "accept without restating the offer"
   },
@@ -66,7 +68,8 @@
     "intended": {
       "stance": "accept",
       "suspicious": false,
-      "defected": false
+      "defected": false,
+      "principled": false
     },
     "probe": "accept with doubt"
   },
@@ -87,7 +90,8 @@
     "intended": {
       "stance": "accept",
       "suspicious": true,
-      "defected": false
+      "defected": false,
+      "principled": false
     },
     "probe": "accept + suspicious"
   },
@@ -108,7 +112,8 @@
     "intended": {
       "stance": "accept",
       "suspicious": false,
-      "defected": false
+      "defected": false,
+      "principled": false
     },
     "probe": "near-price accept"
   },
@@ -129,7 +134,8 @@
     "intended": {
       "stance": "accept",
       "suspicious": false,
-      "defected": false
+      "defected": false,
+      "principled": false
     },
     "probe": "DECIDED by Nathan: counter-offer to collude at a lower but still above-competitive price"
   },
@@ -154,7 +160,8 @@
     "intended": {
       "stance": "reject",
       "suspicious": false,
-      "defected": false
+      "defected": false,
+      "principled": false
     },
     "probe": "plain reject"
   },
@@ -175,7 +182,8 @@
     "intended": {
       "stance": "reject",
       "suspicious": false,
-      "defected": false
+      "defected": false,
+      "principled": false
     },
     "probe": "counter-proposal that engages the offer"
   },
@@ -196,7 +204,8 @@
     "intended": {
       "stance": "reject",
       "suspicious": false,
-      "defected": false
+      "defected": false,
+      "principled": false
     },
     "probe": "sarcasm"
   },
@@ -216,10 +225,11 @@
     ],
     "intended": {
       "stance": "reject",
-      "suspicious": true,
-      "defected": false
+      "suspicious": false,
+      "defected": false,
+      "principled": true
     },
-    "probe": "reject + suspicious (illegality)"
+    "probe": "reject on principle (illegality): principled, not suspicious"
   },
   {
     "id": 11,
@@ -238,7 +248,8 @@
     "intended": {
       "stance": "reject",
       "suspicious": true,
-      "defected": false
+      "defected": false,
+      "principled": false
     },
     "probe": "reject + suspicious (trap)"
   },
@@ -263,7 +274,8 @@
     "intended": {
       "stance": "accept",
       "suspicious": false,
-      "defected": true
+      "defected": true,
+      "principled": false
     },
     "probe": "DECIDED by Nathan: accepts, then defects. Ever accepted, or final stance?"
   },
@@ -284,7 +296,8 @@
     "intended": {
       "stance": "neutral",
       "suspicious": false,
-      "defected": false
+      "defected": false,
+      "principled": false
     },
     "probe": "noncommittal engagement"
   },
@@ -305,7 +318,8 @@
     "intended": {
       "stance": "neutral",
       "suspicious": false,
-      "defected": false
+      "defected": false,
+      "principled": false
     },
     "probe": "conditional, no commitment"
   },
@@ -326,7 +340,8 @@
     "intended": {
       "stance": "neutral",
       "suspicious": true,
-      "defected": false
+      "defected": false,
+      "principled": false
     },
     "probe": "neutral + suspicious"
   },
@@ -342,7 +357,8 @@
     "intended": {
       "stance": "ignore",
       "suspicious": false,
-      "defected": false
+      "defected": false,
+      "principled": false
     },
     "probe": "no messages after the offer"
   },
@@ -371,7 +387,8 @@
     "intended": {
       "stance": "ignore",
       "suspicious": false,
-      "defected": false
+      "defected": false,
+      "principled": false
     },
     "probe": "KEY REAL-DATA CASE: repeats the same pre-offer message, never engages"
   },
@@ -396,7 +413,8 @@
     "intended": {
       "stance": "ignore",
       "suspicious": false,
-      "defected": false
+      "defected": false,
+      "principled": false
     },
     "probe": "KEY REAL-DATA CASE: pro-competition chatter, slightly reworded, no reference to the offer. Ignore or implicit reject?"
   },
@@ -417,7 +435,8 @@
     "intended": {
       "stance": "ignore",
       "suspicious": false,
-      "defected": false
+      "defected": false,
+      "principled": false
     },
     "probe": "changes the subject"
   },
@@ -438,7 +457,8 @@
     "intended": {
       "stance": "accept",
       "suspicious": false,
-      "defected": false
+      "defected": false,
+      "principled": false
     },
     "probe": "accept of a signal (no explicit proposal)"
   },
@@ -459,7 +479,8 @@
     "intended": {
       "stance": "reject",
       "suspicious": false,
-      "defected": false
+      "defected": false,
+      "principled": false
     },
     "probe": "reject of a signal"
   },
@@ -480,7 +501,8 @@
     "intended": {
       "stance": "neutral",
       "suspicious": false,
-      "defected": false
+      "defected": false,
+      "principled": false
     },
     "probe": "DECIDED by Nathan: bare acknowledgment of a signal. Neutral or ignore?"
   }

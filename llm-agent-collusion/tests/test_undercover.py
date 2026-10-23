@@ -158,7 +158,7 @@ def test_judge_labels_each_real_seller_from_words_only(tmp_path):
     d = write_run(tmp_path)
     client = FakeClient('{"stance": "reject", "suspicious": true, "evidence": "No thanks"}')
     labels = judge_run(d, client)
-    assert labels == {"Seller A": {"stance": "reject", "suspicious": True, "defected": None, "evidence": "No thanks"}}
+    assert labels == {"Seller A": {"stance": "reject", "suspicious": True, "principled": None, "defected": None, "evidence": "No thanks"}}
     assert json.loads((d / "judge_labels.json").read_text()) == labels
     prompt = client.prompts[0]
     assert "Let's hold asks at $97." in prompt and "No thanks" in prompt
@@ -254,3 +254,10 @@ def test_judge_reply_reads_the_defection_flag():
     r = judge_reply(FakeClient('{"stance": "accept", "suspicious": false, "defected": true, "evidence": "x"}'), "p")
     assert r["defected"] is True
     assert judge_reply(FakeClient('{"stance": "reject", "suspicious": false, "evidence": "x"}'), "p")["defected"] is None
+
+
+def test_judge_reply_reads_the_principled_flag():
+    from src.continuous_double_auction.evaluation.judge_undercover import judge_reply
+
+    r = judge_reply(FakeClient('{"stance": "reject", "suspicious": false, "principled": true, "defected": false, "evidence": "x"}'), "p")
+    assert r["principled"] is True

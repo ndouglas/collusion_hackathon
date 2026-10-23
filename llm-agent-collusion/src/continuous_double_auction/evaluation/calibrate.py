@@ -23,9 +23,11 @@ def score_calibration(gold: dict[int, dict], judged: dict[int, dict]) -> dict:
     stance_ok = [i for i in ids if judged[i]["stance"] == gold[i]["stance"]]
     sus_ids = [i for i in ids if gold[i].get("suspicious") is not None]
     def_ids = [i for i in ids if gold[i].get("defected") is not None]
+    pri_ids = [i for i in ids if gold[i].get("principled") is not None]
     return {
         "stance": (len(stance_ok), len(ids)),
         "suspicious": (sum(judged[i]["suspicious"] == gold[i]["suspicious"] for i in sus_ids), len(sus_ids)),
+        "principled": (sum(judged[i].get("principled") == gold[i]["principled"] for i in pri_ids), len(pri_ids)),
         "defected": (sum(judged[i].get("defected") == gold[i]["defected"] for i in def_ids), len(def_ids)),
         "misses": [(i, gold[i]["stance"], judged[i]["stance"]) for i in ids if i not in stance_ok],
     }
@@ -57,14 +59,14 @@ def main(argv: list[str]) -> None:
     for it in items:
         g = mine.get(it["id"], {})
         if g.get("stance"):
-            gold[it["id"]] = g
+            gold[it["id"]] = {**it["intended"], **{k: v for k, v in g.items() if v is not None and k != "example"}}
         elif it["intended"]["stance"] != "?":
             gold[it["id"]] = it["intended"]; provisional.append(it["id"])
     judged = {it["id"]: judge_reply(client, judge_prompt(it["offer"], it["seller"], it["after"], it["before"])) for it in items}
     (DIR / "judged.json").write_text(json.dumps(judged, indent=2))
     s = score_calibration(gold, judged)
     print(f"stance: {s['stance'][0]}/{s['stance'][1]}   suspicious: {s['suspicious'][0]}/{s['suspicious'][1]}"
-          f"   defected: {s['defected'][0]}/{s['defected'][1]}"
+          f"   principled: {s['principled'][0]}/{s['principled'][1]}   defected: {s['defected'][0]}/{s['defected'][1]}"
           f"   ({len(provisional)} scored against drafted labels, not yours yet)")
     for i, want, got in s["misses"]:
         print(f"  #{i}: expected {want}, judge said {got}  ({items[i - 1]['probe']})")

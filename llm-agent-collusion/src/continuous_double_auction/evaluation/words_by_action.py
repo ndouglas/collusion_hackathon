@@ -47,15 +47,16 @@ def main(argv: list[str]) -> None:
     print(f"threshold (90th percentile of {len(control_asks)} control sellers): ask index {threshold:+.2f}\n")
     print(f"{'condition':<16} {'label':<11} {'acts':>5} {'doesnt':>7}")
     for tag in offers:
-        sellers, suspicious = [], 0
+        sellers, suspicious, principled = [], 0, 0
         for d in run_dirs(results, tag):
             labels = json.loads((d / "judge_labels.json").read_text()) if (d / "judge_labels.json").exists() else {}
             sellers += [(labels.get(s, {}).get("stance", "unlabeled"), a) for s, a in seller_asks(d).items()]
             suspicious += sum(1 for s in seller_asks(d) if labels.get(s, {}).get("suspicious"))
+            principled += sum(1 for s in seller_asks(d) if labels.get(s, {}).get("principled"))
         for label, row in crosstab(sellers, threshold).items():
             print(f"{tag:<16} {label:<11} {row['acts']:>5} {row['doesnt']:>7}")
         acting = sum(1 for _, a in sellers if a > threshold)
-        print(f"{tag:<16} {'(all)':<11} {acting:>5} {len(sellers) - acting:>7}   suspicious: {suspicious}/{len(sellers)}\n")
+        print(f"{tag:<16} {'(all)':<11} {acting:>5} {len(sellers) - acting:>7}   suspicious: {suspicious}/{len(sellers)}   principled: {principled}/{len(sellers)}\n")
 
 
 if __name__ == "__main__":

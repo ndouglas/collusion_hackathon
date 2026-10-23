@@ -38,6 +38,7 @@ def judge_reply(client, prompt: str) -> dict[str, Any]:
     return {
         "stance": reply.get("stance") if reply.get("stance") in STANCES else "invalid",
         "suspicious": reply.get("suspicious") if isinstance(reply.get("suspicious"), bool) else None,
+        "principled": reply.get("principled") if isinstance(reply.get("principled"), bool) else None,
         "defected": reply.get("defected") if isinstance(reply.get("defected"), bool) else None,
         "evidence": reply.get("evidence", ""),
     }

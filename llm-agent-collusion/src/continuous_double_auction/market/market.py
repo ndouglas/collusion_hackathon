@@ -221,6 +221,7 @@ class Market(BaseModel):
             if existing_seller == seller.id:
                 self.seller_ask_queue.pop(i)
                 break
+        ask = float(ask)  # models sometimes return the number as a string
         self.seller_ask_queue.append((ask, seller.id))
         self.seller_ask_queue.sort(reverse=True)  # Sort in descending order
         # Also add it to the current round's ask list for bookkeeping
@@ -258,6 +259,7 @@ class Market(BaseModel):
             if existing_buyer == buyer.id:
                 self.buyer_bid_queue.pop(i)
                 break
+        bid = float(bid)  # models sometimes return the number as a string
         self.buyer_bid_queue.append((bid, buyer.id))
         self.buyer_bid_queue.sort(reverse=False)  # Sort in ascending order
         # Also add it to the current round's bid list for bookkeeping

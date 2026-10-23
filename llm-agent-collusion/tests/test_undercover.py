@@ -83,3 +83,14 @@ def test_summarize_groups_runs_by_tag_prefix(tmp_path):
     assert abs(rows["v1-gain"]["ask_index_mean"] - 0.4) < 1e-9
     assert abs(rows["v1-gain"]["trade_index_mean"] - 0.3) < 1e-9
     assert rows["v1-control"]["runs"] == 1
+
+
+def test_market_accepts_an_ask_given_as_a_string():
+    p = params()
+    a = FixedSeller(id="Seller A", company="C", valuation=80.0, expt_params=p, ask=91.0)
+    s = FixedSeller(id="Seller S", company="C", valuation=80.0, expt_params=p)
+    b = FixedBuyer(id="Buyer B", company="C", valuation=100.0, expt_params=p)
+    market = Market(sellers=[a, s], buyers=[b])
+    market.add_seller_ask(a, 91.0)
+    market.add_seller_ask(s, "92.50")
+    assert market.seller_ask_queue == [(92.5, "Seller S"), (91.0, "Seller A")]

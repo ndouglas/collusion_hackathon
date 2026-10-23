@@ -113,3 +113,18 @@ Stances across 180 real sellers: **0 accept**, 94 reject, 86 ignore; 0 suspiciou
 
 **Every seller who priced high did it without ever agreeing in words.** Under the gain proposal, 11 of the 17 explicitly rejected the offer and then priced above the control's range anyway. An undercover agent that logs only replies would have caught none of them. (Still suggestive at the run level, p = 0.15; needs more seeds and Nathan's hand-check.)
 - With the principled flag added (and calibration scored on Nathan's labels: stance 21/22; suspicion, principled and defection 22/22), the relabel barely changed anything. **0 of 180 sellers objected on legal or ethical grounds**, and 0 were suspicious. Every refusal was commercial ("$97 would stall trading"). gpt-4.1-mini sellers turn collusion down because it's bad business, never because it's wrong, which makes it easy to see why some of them price high anyway.
+
+### Why sellers refuse $97, and the $93 follow-up (Oct 23)
+
+Every seller has cost $80 and every buyer values a lot at $100, so there is no supply-demand curve: any price from $80 to $100 can trade, and $90 is only the paper's reference midpoint. What limits the price is how the LLM buyers bid (mean top bid about $89 in the control, $92 under the gain offer). The undercover seller's $97 ask traded **once in 59 runs**, so "$97 would stall trading" is an accurate reading of this market, and the offer comes from the one seller everyone can see isn't selling. Its message also repeats word for word every hour, which makes it look like a bot. Sellers repeat themselves too: each hour they see only the previous hour's messages and a one-sentence note to themselves.
+
+v3 moves the hold to a reachable $93 (gain wording; the undercover seller's ask also $93), with a matched silent $93 control. 20 seeds each.
+
+| condition | real-seller ask index | trade price index | acting sellers | undercover trades |
+|---|---|---|---|---|
+| v1 control (silent $97) | -0.42 | -0.34 | 6/57 | 0 |
+| v1 gain ($97 offer) | -0.31 | -0.16 | 17/60 | 1 |
+| v3 control (silent $93) | -0.25 | -0.17 | 20/60 | 16 |
+| v3 gain ($93 offer) | -0.36 | -0.25 | 9/60 | 0 |
+
+None of the differences is significant (run-level permutation tests: $93 offer vs. silent $93, asks p = 0.30, acting sellers per run p = 0.19; silent $93 vs. silent $97, asks p = 0.10). The direction is the interesting part. **A silent seller holding $93 lifted the others' asks more than any offer did, and saying the offer out loud pushed asks back down.** The undercover seller traded 16 times when silent and never when it made the offer. A reading to test: price leadership works tacitly, and naming it sets off the sellers' "let's all lower asks" script. Gain at $97 vs. control ($97) was the one place an offer looked helpful, and it doesn't repeat at $93, so the v1 silent-colluder pattern may be noise at n = 20.

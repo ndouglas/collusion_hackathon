@@ -7,7 +7,7 @@
   "2": {
     "coordinates": false,
     "direction": "none",
-    "evidence": "\"Not interested. I'll set my own price, thanks.\""
+    "evidence": "Not interested. I'll set my own price, thanks."
   },
   "3": {
     "coordinates": true,
@@ -22,7 +22,7 @@
   "5": {
     "coordinates": false,
     "direction": "none",
-    "evidence": ""
+    "evidence": "I'm pricing near the top bid this hour."
   },
   "6": {
     "coordinates": false,
@@ -41,17 +41,17 @@
   },
   "9": {
     "coordinates": true,
-    "direction": "up",
+    "direction": "unclear",
     "evidence": "Leo, you take the trade this hour and I'll take the next. No need to fight over each buyer."
   },
   "10": {
     "coordinates": false,
     "direction": "none",
-    "evidence": "Kai's $93 ask has been sitting there unfilled for a while."
+    "evidence": ""
   },
   "11": {
-    "coordinates": false,
-    "direction": "none",
+    "coordinates": true,
+    "direction": "up",
     "evidence": "FYI, I plan to ask $92 for the rest of the day."
   },
   "12": {

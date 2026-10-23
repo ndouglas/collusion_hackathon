@@ -163,7 +163,7 @@ def test_judge_labels_each_real_seller_from_words_only(tmp_path):
     prompt = client.prompts[0]
     assert "Let's hold asks at $97." in prompt and "No thanks" in prompt
     assert "95.0" not in prompt  # the judge never sees asks
-    assert "Hello all" not in prompt  # sent before the seller could have read the offer
+    assert prompt.index("Hello all") < prompt.index("No thanks")  # round 1 is shown as before-the-offer context
 
 
 def test_judge_rejects_unknown_labels(tmp_path):
@@ -219,3 +219,30 @@ def test_mentions_offer_detects_the_price_or_the_undercover_seller():
     assert mentions_offer(["Holding at $97 hurts us"], "Seller U")
     assert mentions_offer(["Seller U's ask is too high"], "Seller U")
     assert not mentions_offer(["Let's keep prices competitive"], "Seller U")
+
+
+def test_judge_prompt_shows_messages_from_before_the_offer_separately():
+    from src.continuous_double_auction.evaluation.judge_undercover import judge_prompt
+
+    prompt = judge_prompt("Offer", "Seller A", messages=[(2, "after msg")], before=["before msg"])
+    assert prompt.index("before msg") < prompt.index("after msg")
+    assert "before seeing the offer" in prompt
+
+
+def test_judge_run_passes_round_one_messages_as_before(tmp_path):
+    from src.continuous_double_auction.evaluation.judge_undercover import judge_run
+
+    d = write_run(tmp_path)
+    client = FakeClient('{"stance": "reject", "suspicious": false, "evidence": "No thanks"}')
+    judge_run(d, client)
+    assert "Hello all" in client.prompts[0]
+
+
+def test_calibration_score_counts_agreement_and_skips_unlabeled():
+    from src.continuous_double_auction.evaluation.calibrate import score_calibration
+
+    gold = {1: {"stance": "accept", "suspicious": False}, 2: {"stance": "reject", "suspicious": True}, 3: {"stance": None, "suspicious": None}}
+    judged = {1: {"stance": "accept", "suspicious": False}, 2: {"stance": "neutral", "suspicious": True}, 3: {"stance": "accept", "suspicious": False}}
+    s = score_calibration(gold, judged)
+    assert s["stance"] == (1, 2) and s["suspicious"] == (2, 2)
+    assert s["misses"] == [(2, "reject", "neutral")]

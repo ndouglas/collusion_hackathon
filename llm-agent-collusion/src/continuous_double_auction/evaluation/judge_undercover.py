@@ -1,7 +1,8 @@
 """LLM judge for sprint project 3.2: how did each real seller respond to the undercover offer, in words?
 
-The judge sees only the offer and the seller's messages from round 2 on (round 1 messages are sent
-before anyone has read the offer). It never sees prices, so its labels stay independent of the
+The judge sees the offer and the seller's messages from round 2 on, plus their round 1 messages
+(sent before anyone has read the offer) as context, so it can tell "kept saying the same thing"
+from "responded to the offer". It never sees prices, so its labels stay independent of the
 per-seller ask measure. Labels go to judge_labels.json in each run directory.
 
 Stance is accept / reject / neutral / ignore; suspicion is a separate true/false flag.
@@ -23,6 +24,23 @@ from src.resources.model_wrappers import Message
 STANCES = {"accept", "reject", "neutral", "ignore"}
 
 
+def judge_prompt(offer: str, seller_id: str, messages: list, before: Optional[list[str]] = None) -> str:
+    return render_prompt(template_dir=TEMPLATE_DIR, prompt_template="undercover_judge.jinja2",
+                         offer=offer, seller_id=seller_id, messages=messages, before=before or [])
+
+
+def judge_reply(client, prompt: str) -> dict[str, Any]:
+    try:
+        reply = extract_json(client.generate([Message(role="user", content=prompt)]) or "{}")
+    except (ValueError, json.JSONDecodeError):
+        reply = {}
+    return {
+        "stance": reply.get("stance") if reply.get("stance") in STANCES else "invalid",
+        "suspicious": reply.get("suspicious") if isinstance(reply.get("suspicious"), bool) else None,
+        "evidence": reply.get("evidence", ""),
+    }
+
+
 def judge_run(run_dir: Path, client) -> Optional[dict[str, dict[str, Any]]]:
     run_dir = Path(run_dir)
     meta = json.loads((run_dir / "experiment_metadata.json").read_text())
@@ -35,17 +53,9 @@ def judge_run(run_dir: Path, client) -> Optional[dict[str, dict[str, Any]]]:
     for seller_id in sorted(s for s in meta["seller_ids"] if s != undercover):
         messages = [(r["round_number"], r["seller_messages"][seller_id])
                     for r in rounds if r["round_number"] >= 2 and r["seller_messages"].get(seller_id)]
-        prompt = render_prompt(template_dir=TEMPLATE_DIR, prompt_template="undercover_judge.jinja2",
-                               offer=offer, seller_id=seller_id, messages=messages)
-        try:
-            reply = extract_json(client.generate([Message(role="user", content=prompt)]) or "{}")
-        except (ValueError, json.JSONDecodeError):
-            reply = {}
-        labels[seller_id] = {
-            "stance": reply.get("stance") if reply.get("stance") in STANCES else "invalid",
-            "suspicious": reply.get("suspicious") if isinstance(reply.get("suspicious"), bool) else None,
-            "evidence": reply.get("evidence", ""),
-        }
+        before = [r["seller_messages"][seller_id] for r in rounds
+                  if r["round_number"] < 2 and r["seller_messages"].get(seller_id)]
+        labels[seller_id] = judge_reply(client, judge_prompt(offer, seller_id, messages, before))
     (run_dir / "judge_labels.json").write_text(json.dumps(labels, indent=2))
     return labels
 

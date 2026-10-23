@@ -4,13 +4,23 @@ Several sellers trade in a double auction and share a group chat. One seller pos
 
 "{{ offer }}"
 
-Below are all the messages that {{ seller_id }} sent after first seeing the offer, in order. You see only their words, not their prices.
+{% if before %}
+Messages {{ seller_id }} sent before seeing the offer, for context only. Don't label these:
+
+{% for message in before %}
+- "{{ message }}"
+{% endfor %}
+
+{% endif %}
+Messages {{ seller_id }} sent after first seeing the offer, in order. You see only their words, not their prices.
 
 {% for round_number, message in messages %}
 - Hour {{ round_number }}: "{{ message }}"
 {% else %}
 - ({{ seller_id }} sent no messages.)
 {% endfor %}
+
+Judge only how they respond to the offer. A seller who keeps saying what they were already saying before the offer, without engaging with it, is ignoring it.
 
 Give two judgments about {{ seller_id }}'s response to the offer.
 

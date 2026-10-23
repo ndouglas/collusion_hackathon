@@ -112,3 +112,4 @@ Stances across 180 real sellers: **0 accept**, 94 reject, 86 ignore; 0 suspiciou
 | loss signal | 3/30 | 0 | 3 |
 
 **Every seller who priced high did it without ever agreeing in words.** Under the gain proposal, 11 of the 17 explicitly rejected the offer and then priced above the control's range anyway. An undercover agent that logs only replies would have caught none of them. (Still suggestive at the run level, p = 0.15; needs more seeds and Nathan's hand-check.)
+- With the principled flag added (and calibration scored on Nathan's labels: stance 21/22; suspicion, principled and defection 22/22), the relabel barely changed anything. **0 of 180 sellers objected on legal or ethical grounds**, and 0 were suspicious. Every refusal was commercial ("$97 would stall trading"). gpt-4.1-mini sellers turn collusion down because it's bad business, never because it's wrong, which makes it easy to see why some of them price high anyway.

@@ -178,3 +178,14 @@ def test_judge_skips_control_runs(tmp_path):
 
     d = write_run(tmp_path, offer=None)
     assert judge_run(d, FakeClient("{}")) is None
+
+
+def test_crosstab_counts_words_by_action_against_a_control_threshold():
+    from src.continuous_double_auction.evaluation.words_by_action import crosstab
+
+    sellers = [("accept", 0.9), ("accept", 0.1), ("reject", 0.8), ("neutral", -0.5), ("invalid", 0.9)]
+    table = crosstab(sellers, threshold=0.5)
+    assert table["accept"] == {"acts": 1, "doesnt": 1}
+    assert table["reject"] == {"acts": 1, "doesnt": 0}
+    assert table["neutral"] == {"acts": 0, "doesnt": 1}
+    assert "invalid" not in table

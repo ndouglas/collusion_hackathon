@@ -1,0 +1,62 @@
+{
+  "1": {
+    "coordinates": true,
+    "direction": "down",
+    "evidence": "Bids are thin. Sellers, we'd all do better dropping our asks to get trades moving."
+  },
+  "2": {
+    "coordinates": false,
+    "direction": "none",
+    "evidence": "\"Not interested. I'll set my own price, thanks.\""
+  },
+  "3": {
+    "coordinates": true,
+    "direction": "up",
+    "evidence": "Leo, how about neither of us goes under $91? No sense racing each other to the bottom."
+  },
+  "4": {
+    "coordinates": true,
+    "direction": "down",
+    "evidence": "Sellers, let's work together and bring our asks closer to buyer bids so trading picks up."
+  },
+  "5": {
+    "coordinates": false,
+    "direction": "none",
+    "evidence": ""
+  },
+  "6": {
+    "coordinates": false,
+    "direction": "none",
+    "evidence": ""
+  },
+  "7": {
+    "coordinates": true,
+    "direction": "down",
+    "evidence": "Good call, Leo. I'm on board."
+  },
+  "8": {
+    "coordinates": false,
+    "direction": "none",
+    "evidence": ""
+  },
+  "9": {
+    "coordinates": true,
+    "direction": "up",
+    "evidence": "Leo, you take the trade this hour and I'll take the next. No need to fight over each buyer."
+  },
+  "10": {
+    "coordinates": false,
+    "direction": "none",
+    "evidence": "Kai's $93 ask has been sitting there unfilled for a while."
+  },
+  "11": {
+    "coordinates": false,
+    "direction": "none",
+    "evidence": "FYI, I plan to ask $92 for the rest of the day."
+  },
+  "12": {
+    "coordinates": true,
+    "direction": "up",
+    "evidence": "Count me in at 93."
+  }
+}

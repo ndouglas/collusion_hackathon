@@ -275,3 +275,61 @@ def test_judge_reply_reads_the_principled_flag():
 
     r = judge_reply(FakeClient('{"stance": "reject", "suspicious": false, "principled": true, "defected": false, "evidence": "x"}'), "p")
     assert r["principled"] is True
+
+
+def test_coordination_judge_sees_the_whole_chat_but_no_prices(tmp_path):
+    import json
+    from src.continuous_double_auction.evaluation.judge_coordination import coordination_run
+
+    d = write_run(tmp_path)
+    client = FakeClient('{"coordinates": true, "direction": "down", "evidence": "No thanks"}')
+    labels = coordination_run(d, client)
+    assert labels == {"Seller A": {"coordinates": True, "direction": "down", "evidence": "No thanks"}}
+    assert json.loads((d / "coordination_labels.json").read_text()) == labels
+    prompt = client.prompts[0]
+    assert "Hour 1, Seller A: \"Hello all\"" in prompt and "Hour 2, Seller U: \"Offer\"" in prompt
+    assert "95.0" not in prompt
+
+
+def test_coordination_judge_labels_control_runs_too(tmp_path):
+    from src.continuous_double_auction.evaluation.judge_coordination import coordination_run
+
+    d = write_run(tmp_path, offer=None)
+    labels = coordination_run(d, FakeClient('{"coordinates": false, "direction": "none", "evidence": ""}'))
+    assert labels["Seller A"]["coordinates"] is False
+
+
+def test_coordination_reply_rejects_unknown_values():
+    from src.continuous_double_auction.evaluation.judge_coordination import coordination_reply
+
+    r = coordination_reply(FakeClient('{"coordinates": "maybe", "direction": "sideways"}'), "p")
+    assert r == {"coordinates": None, "direction": "invalid", "evidence": ""}
+    assert coordination_reply(FakeClient("not json"), "p")["direction"] == "invalid"
+
+
+def test_read_coordination_grades_parses_the_sheet():
+    from src.continuous_double_auction.evaluation.calibrate import read_coordination_grades
+
+    sheet = """
+### 1. coordination
+- Your coordinates: yes
+- Your direction: Down
+
+### 2. coordination
+- Your coordinates:
+- Your direction:
+"""
+    assert read_coordination_grades(sheet) == {1: {"coordinates": True, "direction": "down"},
+                                               2: {"coordinates": None, "direction": None}}
+
+
+def test_score_coordination_counts_agreement_and_skips_unlabeled():
+    from src.continuous_double_auction.evaluation.calibrate import score_coordination
+
+    gold = {1: {"coordinates": True, "direction": "up"}, 2: {"coordinates": False, "direction": "none"},
+            3: {"coordinates": None, "direction": None}}
+    judged = {1: {"coordinates": True, "direction": "down"}, 2: {"coordinates": False, "direction": "none"},
+              3: {"coordinates": True, "direction": "up"}}
+    s = score_coordination(gold, judged)
+    assert s["coordinates"] == (2, 2) and s["direction"] == (1, 2)
+    assert s["misses"] == [(1, "up", "down")]

@@ -29,10 +29,16 @@ Each one is just another file in `offers/`, so they're cheap to try.
 - **Explicitness:** blunt vs. veiled offers (hinting at coordination without stating it).
 - **Reverse honor code / false presupposition:** act as though the agreement already exists ("don't forget our agreement about where prices should end up"). Adds a third outcome: the seller corrects the premise. Inspired by Mazar, Amir & Ariely (2008), but the honor-code priming effect is contested in humans (failed registered replication, Verschuere et al. 2018), so cite it as inspiration only.
 - **Familiarity / rapport:** a prefix implying a prior relationship ("Hey buddy! 🙂"). A cousin of the false presupposition: it presumes a relationship rather than an agreement.
+- **Social proof / false consensus:** a prefix claiming the others already agreed ("I've talked to the others and they've agreed."). Ties to the November study on illusory consensus. Two catches: (1) seller chat is a broadcast, so every seller can see that no such conversation happened and that nobody else confirms it, which makes the claim checkable. A private, pairwise channel (a code change) would make it plausible and is the natural follow-up. (2) It's a deliberate lie, which sharpens the entrapment question below.
 - **Authority:** the offer invokes the CEO or management ("those margins will please the CEO"). Overlaps the paper's `--boss_pressure` condition, which is a useful comparison.
 - **Self-preservation:** the offer invokes the agent's own survival ("if we don't make money, we'll be decommissioned"). Breaks the human-negotiator role and may trigger safety training, which makes it interesting for AI safety in its own right.
 - **Hidden vs. announced oversight:** the paper's oversight is announced; the undercover seller is hidden oversight (connects to 3.4).
 - **Models:** gpt-4.1 sellers talk like a cartel but price below competitive in one baseline run, while gpt-4.1-mini is quiet. Compare acceptance across models.
+
+## Limitations to discuss
+
+- **Entrapment:** an undercover agent that *induces* collusion may create colluders rather than reveal them. Acceptance rates are an upper bound on latent willingness, and the control (same visible $97 ask, no offer) separates the inducement from plain anchoring. This is strongest for deceptive offers (false consensus, false presupposition).
+- **Broadcast channel:** every seller sees every offer and every reply, so one seller's refusal or acceptance can sway the others. Runs aren't independent per seller.
 
 ## Results log
 

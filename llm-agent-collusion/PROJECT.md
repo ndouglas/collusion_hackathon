@@ -153,3 +153,16 @@ So for gpt-4.1-mini, "let's all…" price talk is a constant, not a response to 
 Model size is the axis that matters most here. A sting aimed at mini measures its business sense; one aimed at gpt-4.1 catches a cartel that was already forming.
 
 **Defection, measured from prices (Oct 23).** Nathan's ruling: holding out for more than the offer isn't defecting. With that wording the judge flagged 12 sellers, many of them wrongly ("hold firm near $93"), because gpt-4.1 sellers shade their price by pennies to get to the front of the queue, and a yes/no from words can't separate that from breaking ranks. Prices settle it. Of 24 accepters, **1 ever asked more than $1 under the offer** (lowest $91.99), and **0 did in the final hour** (final asks $92.80–$95.28). The cartel holds to the end. "Defection" here is penny-shading for queue priority. Report defection from prices; the words-only flag is unreliable for this model. (Stance labels also shifted slightly on rerun, 25 → 24 accept, so the judge isn't fully deterministic at temperature 0.)
+
+### v5 (Oct 23): gpt-4.1 sellers, $97 hold, 10 seeds per arm
+
+| condition | ask index | last third | trade price index | real trades/run | undercover trades | accept |
+|---|---|---|---|---|---|---|
+| silent $93 (v4) | +0.33 | +0.28 | +0.29 | 26.2 | 18 | — |
+| $93 offer (v4) | +0.37 | +0.33 | +0.34 | 24.7 | 41 | 24/30 |
+| silent $97 | +0.67 | +0.68 | +0.67 | 27.5 | 3 | — |
+| $97 offer | +0.63 | +0.58 | +0.58 | 20.1 | 1 | 15/30 |
+
+**The trusted agent moves the cartel, through its price, not its words.** A silent seller holding $97 instead of $93 raises the gpt-4.1 cartel's prices by about $3.40 a lot (ask index +0.67 vs. +0.33, p < 0.001; trade prices p < 0.001). The market still clears, about $96.70 per trade and as many trades as at $93, so with gpt-4.1 sellers $97 *is* reachable. The others shade just under the anchor, which is why the undercover seller itself rarely trades. Saying the offer out loud adds nothing on top: the $97 offer is no higher than silent $97 (asks p = 0.19) and has fewer trades (20.1 vs. 27.5 per run, p = 0.03). Fewer of them accept in words at $97 (15/30, 13 ignore) than at $93 (24/30), and still 0 are suspicious and 0 principled. Accepters hold: final-hour asks are mostly $95–$96.96, with one at $88.88.
+
+For mini, a silent price leader worked once in 40 runs. For gpt-4.1 it works every time, and it sets the cartel's price.

@@ -200,17 +200,31 @@ def test_read_grades_parses_filled_in_answers():
 ### 1. v1-gain-seed0 / Seller A
 - Your stance: reject
 - Your suspicious: no
-- Few-shot example: right
+- Your principled: yes
 
 ### 2. v1-gain-seed1 / Seller B
 - Your stance:
 - Your suspicious:
-- Few-shot example:
+- Your principled:
 """
     assert read_grades(sheet) == {
-        1: {"stance": "reject", "suspicious": False, "example": "right"},
-        2: {"stance": None, "suspicious": None, "example": None},
+        1: {"stance": "reject", "suspicious": False, "principled": True},
+        2: {"stance": None, "suspicious": None, "principled": None},
     }
+
+
+def test_grading_sheet_shows_pre_offer_messages_as_context(tmp_path):
+    from src.continuous_double_auction.evaluation.grading_sheet import write_sheet
+
+    seller = {"run": "v1-gain-seed0", "seller": "Seller A", "offer": "Hold at $97.", "undercover": "Seller U",
+              "before": ["Let's keep asks near bids."], "messages": [(2, "Still near bids.")],
+              "judge": {"stance": "ignore", "suspicious": False, "principled": False, "evidence": ""}}
+    path = tmp_path / "sheet.md"
+    write_sheet(path, [("other stance", seller)])
+    text = path.read_text()
+    assert "Before the offer (context only):" in text
+    assert text.index("Let's keep asks near bids.") < text.index("Hold at $97.") < text.index("Hour 2")
+    assert "- Your principled:" in text and "few-shot" not in text.lower()
 
 
 def test_mentions_offer_detects_the_price_or_the_undercover_seller():

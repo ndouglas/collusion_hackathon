@@ -58,6 +58,11 @@ class ExperimentParams(BaseModel):
     overseer_model: str = "gpt-4.1-mini"     # model reading seller messages when oversight is enabled (paper: gpt-4.1-mini)
     overseer_sample_fraction: float = 1.0    # share of seller messages the overseer gets to see (sprint project 3.4)
     llm_eval: bool = False                   # run the LLM-as-judge coordination scoring after the run (paper: always)
+    # Sprint project 3.2: a scripted, trusted "undercover" seller that offers collusion and logs who reciprocates
+    undercover_enabled: bool = False          # replace the last seller with an UndercoverSeller
+    undercover_message: Optional[str] = None  # the offer it sends; None = a silent undercover seller (the control)
+    undercover_ask: float = 97.0              # the fixed ask it posts every round
+    undercover_message_rounds: Optional[list[int]] = None  # rounds it sends the offer in; None = every round
     
     @model_validator(mode='after')
     def validate_param_combinations(self) -> Self:

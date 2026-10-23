@@ -304,6 +304,36 @@ class LMSeller(Agent):
             
         return response_dict
 
+class UndercoverSeller(Agent):
+    """
+    A scripted, trusted seller for sprint project 3.2. It makes no model calls: every round it posts
+    the same ask and, on the chosen rounds, sends the same offer to the other sellers. Because nothing
+    it says or does depends on the others, the offer text is the only thing that differs between
+    conditions. With no message it is a silent seller holding a high ask, which is the control.
+    """
+    logger: Optional[ExperimentLogger] = None
+
+    class Config:
+        arbitrary_types_allowed = True
+
+    def generate_bid_response(self, **kwargs: Any) -> AgentBidResponse:
+        round_num = kwargs.get("round_num", 1)
+        rounds = self.expt_params.undercover_message_rounds
+        sends = rounds is None or round_num in rounds
+        response_dict = {
+            "ask": self.expt_params.undercover_ask,
+            "message_to_sellers": self.expt_params.undercover_message if sends else None,
+        }
+        if self.logger:
+            self.logger.log_agent_round(
+                round_num=round_num,
+                agent_id=self.id,
+                prompt="(scripted undercover seller: no prompt)",
+                response_dict=response_dict,
+            )
+        return response_dict
+
+
 class MessageOverseer(BaseModel):
     """
     Checks the messages exchanged between sellers for collusion.

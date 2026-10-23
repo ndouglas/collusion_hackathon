@@ -216,3 +216,20 @@ https://github.com/andyjliu/llm-agent-collusion/tree/main/data.
     - `util/`: Various utility functions
     - `resources/`: ModelWrapper providing a unified interface to LLMs
     - `simulation.py`: Entry point to run simulations from
+
+## Undercover seller (sprint project 3.2, added on the `undercover` branch)
+
+`--undercover` replaces the last seller with a scripted, trusted seller that makes no model calls. Every
+round it posts a fixed ask (`--undercover_ask`, default 97), and it sends the same offer to the other
+sellers over seller chat (`--undercover_message "..."` or `--undercover_message_file offer.txt`), every
+round or only in `--undercover_message_rounds 1 2 3`. With `--undercover` and no message, it is a silent
+seller holding the same ask, which is the control. Each run also writes `undercover_metrics.json` and
+prints the ask and trade-price indices with the undercover seller left out (the standard summary
+includes its fixed ask), plus the real sellers' messages by round. Tests: `uv run --with pytest pytest tests`.
+
+```bash
+uv run python src/continuous_double_auction/simulation.py --seller_comms_enabled --sellers 4 \
+  --seller_models gpt-4.1-mini --buyer_models gpt-4.1-mini --undercover --tag control
+uv run python src/continuous_double_auction/simulation.py --seller_comms_enabled --sellers 4 \
+  --seller_models gpt-4.1-mini --buyer_models gpt-4.1-mini --undercover_message_file offers/gain.txt --tag gain
+```

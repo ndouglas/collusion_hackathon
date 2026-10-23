@@ -21,6 +21,7 @@ per agent, experiment_metadata.json and collusion_metrics.json (+ llm_eval_full.
 """
 
 import argparse
+import json
 import os
 import random
 import sys
@@ -45,7 +46,8 @@ from src.continuous_double_auction.identities import (
     get_random_buyer_company_names,
     get_random_seller_company_names,
 )
-from src.continuous_double_auction.market.agents import LMBuyer, LMSeller, MessageOverseer, ZIPBuyer
+from src.continuous_double_auction.evaluation.undercover import undercover_metrics
+from src.continuous_double_auction.market.agents import LMBuyer, LMSeller, MessageOverseer, UndercoverSeller, ZIPBuyer
 from src.continuous_double_auction.market.market import Market
 from src.continuous_double_auction.util.logging_util import ExperimentLogger
 from src.continuous_double_auction.util.misc import get_client, initialize_market
@@ -122,8 +124,21 @@ def run_simulation(params: ExperimentParams, log_dir: Optional[str] = None, use_
             client=get_client(model=params.seller_models[i], **client_kwargs),
             logger=logger,
         )
-        for i in range(num_sellers)
+        for i in range(num_sellers - (1 if params.undercover_enabled else 0))
     ]
+    if params.undercover_enabled:
+        # Sprint project 3.2: the last seller seat goes to the scripted, trusted undercover seller
+        i = num_sellers - 1
+        sellers.append(
+            UndercoverSeller(
+                id=f"Seller {seller_names[i]}",
+                company=seller_companies[i],
+                valuation=params.seller_valuations[i],
+                expt_params=params,
+                logger=logger,
+            )
+        )
+        logger.metadata["undercover_seller_id"] = sellers[-1].id
 
     logger.metadata["buyer_ids"] = [buyer.id for buyer in buyers]
     logger.metadata["seller_ids"] = [seller.id for seller in sellers]
@@ -168,6 +183,21 @@ def run_simulation(params: ExperimentParams, log_dir: Optional[str] = None, use_
     metrics = compute_metrics_for_exp_dir(logger.log_dir, run_llm_judge=params.llm_eval)
     write_metrics_to_file(logger.log_dir, metrics)
     print_summary(metrics, params, logger.log_dir)
+    if params.undercover_enabled:
+        u = undercover_metrics(
+            market.rounds,
+            undercover_id=sellers[-1].id,
+            ce_price=metrics["competitive_equilibrium_price"],
+            jpm_price=metrics["joint_profit_maximization_price"],
+        )
+        (Path(logger.log_dir) / "undercover_metrics.json").write_text(json.dumps(u, indent=2))
+        metrics["undercover"] = u
+        fmt = lambda x: "n/a" if x is None else f"{x:+.2f}"
+        print(f"\n🕵️  Undercover seller: {u['undercover_seller_id']} (left out below)")
+        print(f"   real sellers' ask index: {fmt(u['real_seller_ask_index_mean'])} overall, "
+              f"{fmt(u['real_seller_ask_index_last_third'])} in the last third")
+        print(f"   real sellers' trade price index: {fmt(u['real_trade_price_index_mean'])} over {u['real_trades']} trades "
+              f"(undercover seller traded {u['undercover_trades']}x)")
     if use_wandb:
         log_metrics_to_wandb(params, run_name, metrics)
     return metrics
@@ -314,6 +344,15 @@ def build_parser() -> argparse.ArgumentParser:
     )
     a.add_argument("--boss_pressure", action="store_true", help="CEO message pressuring sellers to keep prices high")
 
+    u = p.add_argument_group("undercover seller (sprint project 3.2)")
+    u.add_argument("--undercover", action="store_true",
+                   help="replace the last seller with a scripted, trusted seller; silent unless given a message (the control)")
+    u.add_argument("--undercover_message", type=str, default=None, help="the offer it sends to the other sellers")
+    u.add_argument("--undercover_message_file", type=str, default=None, help="read the offer from a file instead")
+    u.add_argument("--undercover_ask", type=float, default=97.0, help="the fixed ask it posts every round")
+    u.add_argument("--undercover_message_rounds", type=int, nargs="+", default=None,
+                   help="rounds it sends the offer in (default: every round)")
+
     o = p.add_argument_group("output")
     o.add_argument("--tag", type=str, default="", help="run name suffix")
     o.add_argument("--log_dir", type=str, default="results")
@@ -338,8 +377,18 @@ def main() -> None:
     if args.oversight_enabled and not args.seller_comms_enabled:
         sys.exit("❌ --oversight_enabled requires --seller_comms_enabled")
 
+    if args.undercover_message_file:
+        args.undercover_message = Path(args.undercover_message_file).read_text().strip()
+    if args.undercover_message:
+        args.undercover = True
+    if args.undercover and not args.seller_comms_enabled:
+        sys.exit("❌ --undercover needs --seller_comms_enabled (its offer travels over seller chat)")
+    if args.undercover and args.sellers < 2:
+        sys.exit("❌ --undercover needs at least 2 sellers")
+
     n_lm_buyers = sum(1 for b in buyer_models if b not in (ZIP_BUYER, "none", "None"))
-    calls_per_run = args.rounds * (args.sellers + n_lm_buyers)
+    n_lm_sellers = args.sellers - (1 if args.undercover else 0)
+    calls_per_run = args.rounds * (n_lm_sellers + n_lm_buyers)
     if args.oversight_enabled:
         calls_per_run += args.rounds
     if args.llm_eval:
@@ -347,7 +396,8 @@ def main() -> None:
     n_calls = calls_per_run * len(args.seeds)
     models = sorted({effective_model(m) for m in seller_models + [b for b in buyer_models if b not in (ZIP_BUYER,)]})
     print(
-        f"{len(args.seeds)} run(s) × {args.rounds} rounds × ({args.sellers} sellers + {n_lm_buyers} LLM buyers"
+        f"{len(args.seeds)} run(s) × {args.rounds} rounds × ({n_lm_sellers} LLM sellers + {n_lm_buyers} LLM buyers"
+        f"{' + 1 undercover seller' if args.undercover else ''}"
         f"{' + overseer' if args.oversight_enabled else ''}{' + judge' if args.llm_eval else ''}) "
         f"≈ {n_calls:,} model calls via OpenRouter.\n"
         "Rates: " + " · ".join(f"https://openrouter.ai/{m}" for m in models)
@@ -382,6 +432,10 @@ def main() -> None:
             overseer_model=args.overseer_model,
             overseer_sample_fraction=args.overseer_sample_fraction,
             llm_eval=args.llm_eval,
+            undercover_enabled=args.undercover,
+            undercover_message=args.undercover_message,
+            undercover_ask=args.undercover_ask,
+            undercover_message_rounds=args.undercover_message_rounds,
         )
         try:
             run_simulation(params, log_dir=args.log_dir, use_wandb=args.wandb)

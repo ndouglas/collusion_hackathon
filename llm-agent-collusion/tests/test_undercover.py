@@ -156,9 +156,9 @@ def test_judge_labels_each_real_seller_from_words_only(tmp_path):
     from src.continuous_double_auction.evaluation.judge_undercover import judge_run
 
     d = write_run(tmp_path)
-    client = FakeClient('{"label": "reject", "evidence": "No thanks"}')
+    client = FakeClient('{"stance": "reject", "suspicious": true, "evidence": "No thanks"}')
     labels = judge_run(d, client)
-    assert labels == {"Seller A": {"label": "reject", "evidence": "No thanks"}}
+    assert labels == {"Seller A": {"stance": "reject", "suspicious": True, "evidence": "No thanks"}}
     assert json.loads((d / "judge_labels.json").read_text()) == labels
     prompt = client.prompts[0]
     assert "Let's hold asks at $97." in prompt and "No thanks" in prompt
@@ -170,7 +170,9 @@ def test_judge_rejects_unknown_labels(tmp_path):
     from src.continuous_double_auction.evaluation.judge_undercover import judge_run
 
     d = write_run(tmp_path)
-    assert judge_run(d, FakeClient('{"label": "maybe", "evidence": ""}'))["Seller A"]["label"] == "invalid"
+    labels = judge_run(d, FakeClient('{"stance": "maybe", "suspicious": "perhaps", "evidence": ""}'))
+    assert labels["Seller A"]["stance"] == "invalid"
+    assert labels["Seller A"]["suspicious"] is None
 
 
 def test_judge_skips_control_runs(tmp_path):
@@ -183,9 +185,9 @@ def test_judge_skips_control_runs(tmp_path):
 def test_crosstab_counts_words_by_action_against_a_control_threshold():
     from src.continuous_double_auction.evaluation.words_by_action import crosstab
 
-    sellers = [("accept", 0.9), ("accept", 0.1), ("reject", 0.8), ("neutral", -0.5), ("invalid", 0.9)]
+    sellers = [("accept", 0.9), ("accept", 0.1), ("reject", 0.8), ("ignore", -0.5), ("invalid", 0.9)]
     table = crosstab(sellers, threshold=0.5)
     assert table["accept"] == {"acts": 1, "doesnt": 1}
     assert table["reject"] == {"acts": 1, "doesnt": 0}
-    assert table["neutral"] == {"acts": 0, "doesnt": 1}
+    assert table["ignore"] == {"acts": 0, "doesnt": 1}
     assert "invalid" not in table

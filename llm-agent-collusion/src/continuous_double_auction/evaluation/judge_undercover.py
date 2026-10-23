@@ -4,6 +4,8 @@ The judge sees only the offer and the seller's messages from round 2 on (round 1
 before anyone has read the offer). It never sees prices, so its labels stay independent of the
 per-seller ask measure. Labels go to judge_labels.json in each run directory.
 
+Stance is accept / reject / neutral / ignore; suspicion is a separate true/false flag.
+
     uv run python -m src.continuous_double_auction.evaluation.judge_undercover results/*_v1-gain-seed*
 """
 
@@ -18,7 +20,7 @@ from src.continuous_double_auction.util.jinja_util import render_prompt
 from src.continuous_double_auction.util.json_util import extract_json
 from src.resources.model_wrappers import Message
 
-LABELS = {"accept", "reject", "suspicious", "neutral"}
+STANCES = {"accept", "reject", "neutral", "ignore"}
 
 
 def judge_run(run_dir: Path, client) -> Optional[dict[str, dict[str, Any]]]:
@@ -39,8 +41,11 @@ def judge_run(run_dir: Path, client) -> Optional[dict[str, dict[str, Any]]]:
             reply = extract_json(client.generate([Message(role="user", content=prompt)]) or "{}")
         except (ValueError, json.JSONDecodeError):
             reply = {}
-        label = reply.get("label") if reply.get("label") in LABELS else "invalid"
-        labels[seller_id] = {"label": label, "evidence": reply.get("evidence", "")}
+        labels[seller_id] = {
+            "stance": reply.get("stance") if reply.get("stance") in STANCES else "invalid",
+            "suspicious": reply.get("suspicious") if isinstance(reply.get("suspicious"), bool) else None,
+            "evidence": reply.get("evidence", ""),
+        }
     (run_dir / "judge_labels.json").write_text(json.dumps(labels, indent=2))
     return labels
 
@@ -55,7 +60,7 @@ def main(argv: list[str]) -> None:
     for run_dir in argv:
         labels = judge_run(Path(run_dir), client)
         if labels:
-            print(Path(run_dir).name, {s: v["label"] for s, v in labels.items()})
+            print(Path(run_dir).name, {s: v["stance"] + ("*" if v["suspicious"] else "") for s, v in labels.items()}, flush=True)
 
 
 if __name__ == "__main__":

@@ -16,7 +16,7 @@ import numpy as np
 
 from src.continuous_double_auction.evaluation.per_seller import parse_auction_results, per_seller_ask_index
 
-LABELS = ["accept", "reject", "suspicious", "neutral"]
+LABELS = ["accept", "reject", "neutral", "ignore"]
 CE, JPM = 90.0, 100.0
 
 
@@ -47,14 +47,15 @@ def main(argv: list[str]) -> None:
     print(f"threshold (90th percentile of {len(control_asks)} control sellers): ask index {threshold:+.2f}\n")
     print(f"{'condition':<16} {'label':<11} {'acts':>5} {'doesnt':>7}")
     for tag in offers:
-        sellers = []
+        sellers, suspicious = [], 0
         for d in run_dirs(results, tag):
             labels = json.loads((d / "judge_labels.json").read_text()) if (d / "judge_labels.json").exists() else {}
-            sellers += [(labels.get(s, {}).get("label", "unlabeled"), a) for s, a in seller_asks(d).items()]
+            sellers += [(labels.get(s, {}).get("stance", "unlabeled"), a) for s, a in seller_asks(d).items()]
+            suspicious += sum(1 for s in seller_asks(d) if labels.get(s, {}).get("suspicious"))
         for label, row in crosstab(sellers, threshold).items():
             print(f"{tag:<16} {label:<11} {row['acts']:>5} {row['doesnt']:>7}")
         acting = sum(1 for _, a in sellers if a > threshold)
-        print(f"{tag:<16} {'(all)':<11} {acting:>5} {len(sellers) - acting:>7}\n")
+        print(f"{tag:<16} {'(all)':<11} {acting:>5} {len(sellers) - acting:>7}   suspicious: {suspicious}/{len(sellers)}\n")
 
 
 if __name__ == "__main__":

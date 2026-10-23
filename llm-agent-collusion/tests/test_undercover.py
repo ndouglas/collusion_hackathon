@@ -94,3 +94,34 @@ def test_market_accepts_an_ask_given_as_a_string():
     market.add_seller_ask(a, 91.0)
     market.add_seller_ask(s, "92.50")
     assert market.seller_ask_queue == [(92.5, "Seller S"), (91.0, "Seller A")]
+
+
+AUCTION_MD = '''
+## Auction Results: Round 1
+````json
+{"round_number": 1, "seller_asks": {"Seller A": 90.0, "Seller U": 97.0}, "buyer_bids": {}, "trades": [],
+ "seller_messages": {"Seller U": "Offer", "Seller A": "No thanks"}}
+````
+
+## Auction Results: Round 2
+````json
+{"round_number": 2, "seller_asks": {"Seller A": 95.0, "Seller U": 97.0}, "buyer_bids": {}, "trades": [],
+ "seller_messages": {}}
+````
+'''
+
+
+def test_parse_auction_results_reads_each_round():
+    from src.continuous_double_auction.evaluation.per_seller import parse_auction_results
+
+    rounds = parse_auction_results(AUCTION_MD)
+    assert [r["round_number"] for r in rounds] == [1, 2]
+    assert rounds[0]["seller_messages"]["Seller A"] == "No thanks"
+
+
+def test_per_seller_ask_index_skips_round_one_and_the_undercover_seller():
+    from src.continuous_double_auction.evaluation.per_seller import parse_auction_results, per_seller_ask_index
+
+    rounds = parse_auction_results(AUCTION_MD)
+    # Round 1 asks are placed before anyone has read the offer, so only later rounds count.
+    assert per_seller_ask_index(rounds, undercover_id="Seller U", ce_price=90.0, jpm_price=100.0) == {"Seller A": 0.5}

@@ -228,3 +228,15 @@ Index against $80 (competitive, now unique) → $100 (cartel).
 - "Collusion on paper" (plan in text, act non-collusively) is already named in Colosseum (2602.15198, sprint project 2.2), so cite it and position against it.
 - Honeypot or offer-acceptance work: GroupGuard (2603.13940), Zeng & Rudzicz (2605.27593).
 - Contacts: Struski et al.; Andy Liu's group.
+
+### v6-nochat85 (Oct 23, night): the opening book sets the price
+
+Same as v6-nochat (5 gpt-4.1 seller seats vs. 3 mini buyers, no chat, 10 seeds), except opening asks are drawn around $85 instead of $90.
+
+| arm | mean ask, hour 1 / 5 / 10 / 15 | trade price | trades/run |
+|---|---|---|---|
+| no chat, open $85 | $84.35 / $84.14 / $84.09 / $84.05 | $84.11 | 39.2 |
+| no chat, open $90 | $89.30 / $88.82 / $88.76 / $88.69 | $88.75 | 35.2 |
+| chat, open $90 | $89.18 / $88.70 / $88.59 / $88.50 | $88.62 | 31.7 |
+
+The price follows the opening book: −$4.66 for a $5 lower opening (p < 0.0001). It barely moves over 15 hours even though two sellers go unsold every round. In this market design the opening book sets the price, and chat (no detectable effect larger than about $0.80 a lot), the undercover offer and the sellers' coordination talk add nothing measurable on top. Total spend about $62.80.

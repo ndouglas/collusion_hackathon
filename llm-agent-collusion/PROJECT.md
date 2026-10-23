@@ -74,4 +74,4 @@ Words × action, seller level. "Acts" means the seller's own ask index (rounds 2
 - **Silent colluders:** under the gain proposal, 28% of sellers priced above the control's range, and every one of them said no. Words alone would have caught none of them.
 - Almost nobody is suspicious (1 of 180). Mini sellers don't read the offer as a trap; they argue against it in the open ("Seller Kai's $97 ask is hurting all sellers…").
 - **The judge needs a hand-check before reporting.** Of 6 "accept" labels, about 3 look wrong: "keep asks close to the highest bids" is a counter-proposal (an implicit reject), not an accept. Fix the prompt, or hand-label the accepts.
-- Caveat: sellers in the same run aren't independent (broadcast channel), so the seller-level Fisher p is optimistic. A run-level check is needed.
+- Run-level check: the acting sellers cluster in 7 of the 20 gain runs (mean share 0.28 vs. control 0.11, permutation p = 0.15). Sellers in one run move together, as expected on a broadcast channel. So the seller-level p ≈ 0.02 overstates it; the honest status is *suggestive*. More seeds would settle it (about 11¢ per run).

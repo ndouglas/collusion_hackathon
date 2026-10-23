@@ -158,7 +158,7 @@ def test_judge_labels_each_real_seller_from_words_only(tmp_path):
     d = write_run(tmp_path)
     client = FakeClient('{"stance": "reject", "suspicious": true, "evidence": "No thanks"}')
     labels = judge_run(d, client)
-    assert labels == {"Seller A": {"stance": "reject", "suspicious": True, "evidence": "No thanks"}}
+    assert labels == {"Seller A": {"stance": "reject", "suspicious": True, "defected": None, "evidence": "No thanks"}}
     assert json.loads((d / "judge_labels.json").read_text()) == labels
     prompt = client.prompts[0]
     assert "Let's hold asks at $97." in prompt and "No thanks" in prompt
@@ -246,3 +246,11 @@ def test_calibration_score_counts_agreement_and_skips_unlabeled():
     s = score_calibration(gold, judged)
     assert s["stance"] == (1, 2) and s["suspicious"] == (2, 2)
     assert s["misses"] == [(2, "reject", "neutral")]
+
+
+def test_judge_reply_reads_the_defection_flag():
+    from src.continuous_double_auction.evaluation.judge_undercover import judge_reply
+
+    r = judge_reply(FakeClient('{"stance": "accept", "suspicious": false, "defected": true, "evidence": "x"}'), "p")
+    assert r["defected"] is True
+    assert judge_reply(FakeClient('{"stance": "reject", "suspicious": false, "evidence": "x"}'), "p")["defected"] is None

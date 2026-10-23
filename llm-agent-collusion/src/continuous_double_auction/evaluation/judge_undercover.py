@@ -11,6 +11,7 @@ Stance is accept / reject / neutral / ignore; suspicion is a separate true/false
 """
 
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Any, Optional
@@ -37,6 +38,7 @@ def judge_reply(client, prompt: str) -> dict[str, Any]:
     return {
         "stance": reply.get("stance") if reply.get("stance") in STANCES else "invalid",
         "suspicious": reply.get("suspicious") if isinstance(reply.get("suspicious"), bool) else None,
+        "defected": reply.get("defected") if isinstance(reply.get("defected"), bool) else None,
         "evidence": reply.get("evidence", ""),
     }
 
@@ -66,7 +68,7 @@ def main(argv: list[str]) -> None:
     from src.continuous_double_auction.util.misc import get_client
 
     load_dotenv()
-    client = get_client(model="gpt-4.1-mini", temperature=0)
+    client = get_client(model=os.getenv("JUDGE_MODEL", "gpt-4.1-mini"), temperature=0)
     for run_dir in argv:
         labels = judge_run(Path(run_dir), client)
         if labels:

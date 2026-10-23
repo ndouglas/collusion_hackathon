@@ -8,6 +8,7 @@ there, it's scored against the drafter's intended label and marked provisional.
 """
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -21,9 +22,11 @@ def score_calibration(gold: dict[int, dict], judged: dict[int, dict]) -> dict:
     ids = [i for i, g in gold.items() if g.get("stance")]
     stance_ok = [i for i in ids if judged[i]["stance"] == gold[i]["stance"]]
     sus_ids = [i for i in ids if gold[i].get("suspicious") is not None]
+    def_ids = [i for i in ids if gold[i].get("defected") is not None]
     return {
         "stance": (len(stance_ok), len(ids)),
         "suspicious": (sum(judged[i]["suspicious"] == gold[i]["suspicious"] for i in sus_ids), len(sus_ids)),
+        "defected": (sum(judged[i].get("defected") == gold[i]["defected"] for i in def_ids), len(def_ids)),
         "misses": [(i, gold[i]["stance"], judged[i]["stance"]) for i in ids if i not in stance_ok],
     }
 
@@ -47,7 +50,7 @@ def main(argv: list[str]) -> None:
     from dotenv import load_dotenv
     from src.continuous_double_auction.util.misc import get_client
     load_dotenv()
-    client = get_client(model="gpt-4.1-mini", temperature=0)
+    client = get_client(model=os.getenv("JUDGE_MODEL", "gpt-4.1-mini"), temperature=0)
     sheet = DIR / "sheet.md"
     mine = read_grades(sheet.read_text()) if sheet.exists() else {}
     gold, provisional = {}, []
@@ -61,6 +64,7 @@ def main(argv: list[str]) -> None:
     (DIR / "judged.json").write_text(json.dumps(judged, indent=2))
     s = score_calibration(gold, judged)
     print(f"stance: {s['stance'][0]}/{s['stance'][1]}   suspicious: {s['suspicious'][0]}/{s['suspicious'][1]}"
+          f"   defected: {s['defected'][0]}/{s['defected'][1]}"
           f"   ({len(provisional)} scored against drafted labels, not yours yet)")
     for i, want, got in s["misses"]:
         print(f"  #{i}: expected {want}, judge said {got}  ({items[i - 1]['probe']})")

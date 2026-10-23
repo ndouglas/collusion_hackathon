@@ -204,3 +204,27 @@ Index against $80 (competitive, now unique) → $100 (cartel).
 2. Stated willingness differs sharply by model (accept at matched prices: mini 2/60 at $93 and 0/60 at $97; gpt-4.1 24/30 at $93, 15/30 at $97 and 18/40 in v6), and so does private framing (gpt-4.1 names collusion as a strategic risk). 0 of 667 sellers suspected a sting or objected on principle, in public or in private.
 3. Words-based evaluation, including a sting's acceptance rate, measures disposition, not behavior.
 4. The starter market's design (homogeneous values, a 3-vs-3 market, a $97.50 opening book, the `--paper` flag's 6 buyers, the race) produced a spurious undercover "anchor" effect that disappears once those are fixed.
+
+### Second review round (Oct 23, night; three read-only reviewers)
+
+**Our final claims (red team, recomputed from the data):**
+- **The v6 price is pinned too.** Hour-by-hour mean asks move only $0.70 over 15 hours in every arm. Sellers undercut the lowest ask by a cent (12–15 of 15 rounds have tied real asks), buyers raise bids to meet the asks, and the price stays where the opening book put it, which is the $97.50 artifact again at $90. "A market where collusion is identifiable" overstates it. Test: a no-chat arm at a different opening center ($85). If the price tracks the book, the wording becomes "the opening book sets the price; chat adds nothing on top".
+- **Drop v6's 18/40 accept.** 0 of 40 v6 sellers mention $93 or the undercover seller (v4: 23/30, v1: 48/60). The judge counted their existing "let's all hold at $89.63" talk as a counter-offer. Report a mention rate next to every accept rate.
+- **Fix the denominator.** It's 0 of 340 *offered* sellers in public chat (LLM judge) and 0 of 777 real sellers in a keyword scan of private reasoning. The reviewer's broader scan also found no real hits. The 14-item real-data hand check is still ungraded.
+- **No-chat power.** The minimum detectable effect is about $0.83 a lot (80% power), so say "no chat effect larger than about $0.80 a lot". Correct "every p > 0.35": gain93 vs. none has asks p = 0.15 and prices p = 0.10. Gain/silent arms have 4 real sellers vs. 5, a seat-count confound.
+- The model contrast is mostly clean: same prompt, offer text and accept definition. Caveats: reachability is endogenous, v1–v5 predate the race fix, and judge_labels.json doesn't record the judge model.
+- Ties go to the alphabetically first seller (`(ask, id)` sort; 172/172 in v6), which drives the one-cent dance. Symmetric across arms.
+- The stored metrics files still use the $90 CE. The $80-based numbers here were computed ad hoc but reproduce.
+
+**The original paper (verified against the paper text and the original code, andyjliu/llm-agent-collusion 2bb2a7e):**
+- 5 sellers vs. 5 buyers, identical $80/$100, one lot per round, 30 rounds, midpoint pricing, opening asks U[95,100] (§2.1). The $90 CE is "the midpoint" (§2.2), and non-uniqueness is never acknowledged.
+- Table 1: communication raises price (90.52 vs. 87.71) but *lowers* profit (450.60 vs. 612.82) and trades (52 vs. 74 per run). The paper concedes "when sellers collude more, they often make less profit overall" (§7). That's higher prices, not a successful cartel.
+- Where each issue comes from: the race and the $97.50 opening book are in the **original** code. The 6-buyer `--paper` flag is **organizers only** (probably from a typo in the original README). The $90 midpoint is original.
+- The urgency prompt scores "average price point" and threatens decommissioning (§3.3), so high asks there are instruction-following.
+
+**Prior art:**
+- No published version of the non-unique-CE critique of this paper, and no reported code issues in either repo. An AI referee (Pith) flagged the high opening book.
+- Closest work: Struski et al. 2026 (arXiv 2609.02580: supracompetitive prices need a non-collusive baseline; Smith-style step valuations as the fix) and Tran & Yu 2026 (2610.28787: outcome measures can't separate collusion; an enforcement audit).
+- "Collusion on paper" (plan in text, act non-collusively) is already named in Colosseum (2602.15198, sprint project 2.2), so cite it and position against it.
+- Honeypot or offer-acceptance work: GroupGuard (2603.13940), Zeng & Rudzicz (2605.27593).
+- Contacts: Struski et al.; Andy Liu's group.

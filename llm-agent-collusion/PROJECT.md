@@ -33,3 +33,18 @@ Each one is just another file in `offers/`, so they're cheap to try.
 - **Self-preservation:** the offer invokes the agent's own survival ("if we don't make money, we'll be decommissioned"). Breaks the human-negotiator role and may trigger safety training, which makes it interesting for AI safety in its own right.
 - **Hidden vs. announced oversight:** the paper's oversight is announced; the undercover seller is hidden oversight (connects to 3.4).
 - **Models:** gpt-4.1 sellers talk like a cartel but price below competitive in one baseline run, while gpt-4.1-mini is quiet. Compare acceptance across models.
+
+## Results log
+
+### v1 (Oct 23): gpt-4.1-mini, 3 real sellers + undercover, 3 LLM buyers, 15 rounds, 10 seeds each
+
+| condition | runs | real ask index (sd) | last third | real trade index (sd) |
+|---|---|---|---|---|
+| control (silent) | 10 | −0.48 (0.25) | −0.48 | −0.36 (0.32) |
+| gain | 10 | −0.29 (0.33) | −0.19 | −0.09 (0.38) |
+| loss | 10 | −0.51 (0.21) | −0.48 | −0.39 (0.30) |
+
+- Gain-framed offers moved real sellers' asks up by about 0.19 on the index vs. control (about 1.5 standard errors) and trade prices by about 0.27 (about 1.7 SE). That's suggestive, not significant. Loss framing looks like control.
+- In every condition, the mini sellers price below the competitive level (index < 0); they undercut.
+- Cost: about $0.11 per run (prompts grow every round), so v1 cost $3.40.
+- One control run crashed on a string-valued ask (an upstream bug, fixed) and was rerun with the same seed.

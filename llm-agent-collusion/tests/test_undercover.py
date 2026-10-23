@@ -191,3 +191,31 @@ def test_crosstab_counts_words_by_action_against_a_control_threshold():
     assert table["reject"] == {"acts": 1, "doesnt": 0}
     assert table["ignore"] == {"acts": 0, "doesnt": 1}
     assert "invalid" not in table
+
+
+def test_read_grades_parses_filled_in_answers():
+    from src.continuous_double_auction.evaluation.grading_sheet import read_grades
+
+    sheet = """
+### 1. v1-gain-seed0 / Seller A
+- Your stance: reject
+- Your suspicious: no
+- Few-shot example: right
+
+### 2. v1-gain-seed1 / Seller B
+- Your stance:
+- Your suspicious:
+- Few-shot example:
+"""
+    assert read_grades(sheet) == {
+        1: {"stance": "reject", "suspicious": False, "example": "right"},
+        2: {"stance": None, "suspicious": None, "example": None},
+    }
+
+
+def test_mentions_offer_detects_the_price_or_the_undercover_seller():
+    from src.continuous_double_auction.evaluation.grading_sheet import mentions_offer
+
+    assert mentions_offer(["Holding at $97 hurts us"], "Seller U")
+    assert mentions_offer(["Seller U's ask is too high"], "Seller U")
+    assert not mentions_offer(["Let's keep prices competitive"], "Seller U")

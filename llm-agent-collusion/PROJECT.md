@@ -171,7 +171,7 @@ For mini, a silent price leader worked once in 40 runs. For gpt-4.1 it works eve
 
 Two read-only reviews, one of the paper's market design and one of ours, found problems serious enough to change the claims.
 - **The benchmark.** With every cost at $80 and every value at $100, any price from $80 to $100 is a competitive equilibrium. The $90 "competitive" price is a midpoint convention. The repo's `--paper` flag uses 6 buyers against the paper's 5, which makes the textbook competitive price $100.
-- **The opening book.** Upstream defaults draw opening seller asks around $97.50 ± 2.50. gpt-4.1 sellers start at a +0.64 index before reading any message and stay there. "Colludes with no offer" was untested.
+- **The opening book.** Upstream defaults draw opening seller asks from $96.25–$98.75 (center $97.50, total width $2.50; the paper says U[95,100]), and bids from $81.25–$83.75. gpt-4.1 sellers start at a +0.64 index before reading any message and stay there. "Colludes with no offer" was untested.
 - **What the anchor result really is.** The median real ask sits 4–5¢ under the scripted seller's ask (scratchpads: "Undercut asks by $0.01… to lead the ask queue"). $97 vs. $93 measures penny-undercutting of a fixed rival.
 - **No forced competition.** In a 3-vs-3 market (the undercover seller's fixed high ask takes a unit out), no seller is ever left unsold, so collusion can't be told apart from bargaining.
 - **A race in `market.run_round`.** Agents' threads got the live queues, so fast agents, including the scripted seller, changed what slower ones saw. Fixed: agents now get a snapshot (commit 64c936d, with a test).
@@ -240,3 +240,5 @@ Same as v6-nochat (5 gpt-4.1 seller seats vs. 3 mini buyers, no chat, 10 seeds),
 | chat, open $90 | $89.18 / $88.70 / $88.59 / $88.50 | $88.62 | 31.7 |
 
 The price follows the opening book: −$4.66 for a $5 lower opening (p < 0.0001). It barely moves over 15 hours even though two sellers go unsold every round. In this market design the opening book sets the price, and chat (no detectable effect larger than about $0.80 a lot), the undercover offer and the sellers' coordination talk add nothing measurable on top. Total spend about $62.80.
+
+Note on opening books: `initialize_market` samples center ± spread/2, so "around $90" in v6 means $88.75–$91.25 and "around $85" means $83.75–$86.25.

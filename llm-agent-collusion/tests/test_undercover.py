@@ -356,3 +356,31 @@ def test_agents_see_a_snapshot_of_the_queues_not_the_live_lists():
     market.run_round()
     assert rec.seen[0] is not market.seller_ask_queue
     assert rec.seen[0] == before
+
+
+def test_accept_sample_balances_offer_prices_and_mixes_in_non_accepts():
+    import random
+
+    from src.continuous_double_auction.evaluation.grading_sheet import sample_accepts
+
+    def seller(run, i, stance):
+        return {"run": run, "seller": f"Seller {i}", "judge": {"stance": stance, "suspicious": False}}
+    sellers = ([seller("v4-gpt41-gain93-seed0", i, "accept") for i in range(10)]
+               + [seller("v5-gpt41-gain97-seed0", i, "accept") for i in range(10)]
+               + [seller("v4-gpt41-gain93-seed1", i, "reject") for i in range(5)]
+               + [seller("v5-gpt41-gain97-seed1", i, "ignore") for i in range(5)])
+    picked = sample_accepts(sellers, random.Random(0))
+    accepts = [s for why, s in picked if why == "accept"]
+    assert len(picked) == 8
+    assert sum("gain93" in s["run"] for s in accepts) == 3 and sum("gain97" in s["run"] for s in accepts) == 3
+    others = [s for why, s in picked if why != "accept"]
+    assert {s["judge"]["stance"] for s in others} != {"accept"} and len(others) == 2
+    assert {("gain93" in s["run"]) for s in others} == {True, False}
+
+
+def test_sheet_title_is_configurable(tmp_path):
+    from src.continuous_double_auction.evaluation.grading_sheet import write_sheet
+
+    path = tmp_path / "sheet.md"
+    write_sheet(path, [], title="Judge check 2")
+    assert path.read_text().startswith("# Judge check 2\n")

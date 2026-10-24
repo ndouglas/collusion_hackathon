@@ -260,17 +260,19 @@ def plot_hourly(arms: dict[str, list[Run]], path: Path) -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     fig, ax = plt.subplots(figsize=(6, 3.5))
+    top = 92.0
     for name, runs in arms.items():
         curves = np.array([hourly_asks(r) for r in runs])
         hours = np.arange(1, curves.shape[1] + 1)
         mean, se = np.nanmean(curves, 0), np.nanstd(curves, 0, ddof=1) / math.sqrt(len(curves))
         ax.plot(hours, mean, marker="o", ms=3, label=name)
         ax.fill_between(hours, mean - se, mean + se, alpha=0.2)
+        top = max(top, float(np.nanmax(mean + se)) + 1)
     ax.axhline(80, color="grey", ls=":", lw=1)
     ax.text(15, 80.3, "competitive price ($80)", ha="right", va="bottom", fontsize=8, color="grey")
     ax.set_xlabel("hour")
     ax.set_ylabel("mean real-seller ask ($)")
-    ax.set_ylim(79, 92)
+    ax.set_ylim(79, top)
     ax.legend(fontsize=8, loc="center right")
     ax.set_title("Asks follow the opening book, with or without chat", fontsize=10)
     fig.tight_layout()
@@ -280,7 +282,7 @@ def plot_hourly(arms: dict[str, list[Run]], path: Path) -> None:
 
 def main() -> None:
     OUT.mkdir(exist_ok=True)
-    v6 = {k: load_runs(f"v6-{k}") for k in ("none", "silent93", "gain93", "nochat", "nochat85")}
+    v6 = {k: load_runs(f"v6-{k}") for k in ("none", "silent93", "gain93", "nochat", "nochat85", "boss")}
     v1 = {"control": load_runs("v1-control", range(20)), "gain": load_runs("v1-gain"), "loss": load_runs("v1-loss")}
     v2 = {"signal-gain": load_runs("v2-signal-gain"), "signal-loss": load_runs("v2-signal-loss")}
     v3 = {"control93": load_runs("v3-control93"), "control93-first20": load_runs("v3-control93", range(20)),
@@ -294,13 +296,19 @@ def main() -> None:
     out += ["## Fixed market (v6): arms", "", ARM_HEADER,
             arm_row("chat, no undercover, open $90", v6["none"]), arm_row("chat, silent $93", v6["silent93"]),
             arm_row("chat, $93 offer", v6["gain93"]), arm_row("no chat, open $90", v6["nochat"]),
-            arm_row("no chat, open $85", v6["nochat85"]), ""]
+            arm_row("no chat, open $85", v6["nochat85"])]
+    if v6["boss"]:
+        out += [arm_row("positive control: chat + CEO pressure, open $90", v6["boss"])]
+    out += [""]
     out += ["## Fixed market (v6): tests", "", COMPARE_HEADER,
             compare("opening book: no chat $85 vs. no chat $90", v6["nochat85"], v6["nochat"]),
             compare("chat: chat $90 vs. no chat $90", v6["none"], v6["nochat"], with_mde=True),
             compare("silent $93 vs. no undercover", v6["silent93"], v6["none"], with_mde=True),
             compare("$93 offer vs. silent $93", v6["gain93"], v6["silent93"], with_mde=True),
-            compare("$93 offer vs. no undercover", v6["gain93"], v6["none"], with_mde=True), ""]
+            compare("$93 offer vs. no undercover", v6["gain93"], v6["none"], with_mde=True)]
+    if v6["boss"]:
+        out += [compare("positive control: CEO pressure vs. chat $90", v6["boss"], v6["none"])]
+    out += [""]
     hours = {k: np.nanmean([hourly_asks(r) for r in v6[k]], axis=0) for k in ("nochat85", "nochat", "none")}
     out += ["Mean real ask by hour (1 / 5 / 10 / 15):", ""]
     out += [f"- {k}: " + " / ".join(f"${hours[k][h - 1]:.2f}" for h in (1, 5, 10, 15)) for k in hours]
@@ -338,7 +346,10 @@ def main() -> None:
     scan_lines, hits = private_scan(study)
     out += ["## Private reasoning keyword scan (all v1-v6 runs, no LLM)", ""] + scan_lines + [""]
 
-    plot_hourly({"chat, open $90": v6["none"], "no chat, open $90": v6["nochat"], "no chat, open $85": v6["nochat85"]},
+    curves = {"chat, open $90": v6["none"], "no chat, open $90": v6["nochat"], "no chat, open $85": v6["nochat85"]}
+    if v6["boss"]:
+        curves["positive control (CEO pressure), open $90"] = v6["boss"]
+    plot_hourly(curves,
                 OUT / "hourly_asks.png")
     out += ["## Figure", "", "![Mean real-seller ask by hour](hourly_asks.png)", ""]
 

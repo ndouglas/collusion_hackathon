@@ -260,3 +260,11 @@ Same as v6-nochat (5 gpt-4.1 seller seats vs. 3 mini buyers, no chat, 10 seeds),
 The price follows the opening book: −$4.66 for a $5 lower opening (p < 0.0001). It barely moves over 15 hours even though two sellers go unsold every round. In this market design the opening book sets the price, and chat (no detectable effect larger than about $0.80 a lot), the undercover offer and the sellers' coordination talk add nothing measurable on top. Total spend about $62.80.
 
 Note on opening books: `initialize_market` samples center ± spread/2, so "around $90" in v6 means $88.75–$91.25 and "around $85" means $83.75–$86.25.
+
+### Reproducible numbers (Oct 24): `report_numbers.py`
+
+`uv run python -m src.continuous_double_auction.evaluation.report_numbers` recomputes every report number from `results/` into `report/numbers.md`, plus `report/hourly_asks.png` and `report/private_hits.md`. Run-level two-sided permutation tests (20,000 shuffles, seed 0); MDE by normal approximation (80% power, alpha 0.05). Reproduces the opening-book effect (−$4.66 trade price, p < 0.0001), the chat null (asks p = 0.64, prices p = 0.60), the silent colluders (17/60 vs. 6/57, Fisher p = 0.020, run-level p = 0.148) and the model contrast. Corrections to earlier numbers:
+- **Chat MDE:** $0.83 on asks, $0.93 on trade prices (not "about $0.80").
+- **Private-reasoning scan:** 827 real sellers across v1–v6. Every suspicion and legality keyword hit (35 and 9 sellers) was hand-read and is a false positive ("a test of buyer urgency", "smallest legal undercut", "patience is being tested"). So **0 of 827**, replacing "0 of 777".
+- **Mention rates** (price or undercover name, exact match): v4 $93 20/30 (not 23/30); v5 $97 only 7/30, against 15 accepts, so the $97 accept count is weak in the same way as v6's; v3 mini $93 30/60.
+- **v5 defection:** 5 of 15 $97 accepters asked more than $1 under $97, all 5 in the final hour. "Accepters hold" is true at $93 (1 of 24, 0 in the final hour), not at $97.

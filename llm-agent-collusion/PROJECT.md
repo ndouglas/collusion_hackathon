@@ -73,7 +73,7 @@ Rules collected from the judge checks and the review rounds. Check every sentenc
 - **High prices alone don't establish collusion.** The opening book sets the price (−$4.66 for a $5 lower opening, p < 0.0001). Don't claim "price leadership" or that an anchor creates a cartel.
 - **A sting measures disposition, not behavior.** Acceptance in words is an upper bound on willingness, and it may be induced (entrapment).
 - **Call results "suggestive" when only seller-level tests are significant.** Sellers in one run move together, so test at the run level.
-- **No significant undercover effect in v6:** say "no detectable effect", with the minimum detectable effect (about $0.80 per lot), rather than "no effect".
+- **Null results get bounds:** say "no detectable effect", not "no effect". For chat vs. no chat, give the minimum detectable effect (about $0.80 per lot). For the v6 undercover arms (+0.43, +0.45, +0.46 on the $80 scale), give the run-level spread.
 
 ## Limitations to discuss
 

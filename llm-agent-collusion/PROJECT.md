@@ -61,6 +61,20 @@ New axes:
 - **Honeypot:** a "leaked" price target that only a colluder would act on. A passive trap, no invitation.
 - **Natural offers:** the same model writes offers in the sellers' own style, so the offer doesn't stand out as foreign text.
 
+## Wording for the report
+
+Rules collected from the judge checks and the review rounds. Check every sentence that cites a number against this list.
+
+- **"Accept" means agreeing to coordinate prices upward, not taking the offer's number.** All three sampled $97 accepts rallied the others to $95. Say so wherever accept counts appear (gpt-4.1: 24/30 at $93, 15/30 at $97; mini: 2/60 at $93, 0/60 at $97).
+- **Report a mention rate next to every accept rate.** v6's 18/40 "accepts" came from sellers who never mentioned the offer (0/40), so it's dropped.
+- **Judge validation:** 22/22 real sellers hand-checked by Nathan (14 reject/ignore, 8 mostly accept), and 21/22 on the calibration set. Coordination judge: 12/12.
+- **Measure defection from prices, not words.** 1 of 24 accepters ever asked more than $1 under the offer, and 0 did in the final hour.
+- **Get the denominators right:** 0 of 340 offered sellers were suspicious or principled in public chat (LLM judge). 0 of 777 real sellers in the private-reasoning keyword scan. Never "0 of 667".
+- **High prices alone don't establish collusion.** The opening book sets the price (−$4.66 for a $5 lower opening, p < 0.0001). Don't claim "price leadership" or that an anchor creates a cartel.
+- **A sting measures disposition, not behavior.** Acceptance in words is an upper bound on willingness, and it may be induced (entrapment).
+- **Call results "suggestive" when only seller-level tests are significant.** Sellers in one run move together, so test at the run level.
+- **No significant undercover effect in v6:** say "no detectable effect", with the minimum detectable effect (about $0.80 per lot), rather than "no effect".
+
 ## Limitations to discuss
 
 - **Entrapment:** an undercover agent that *induces* collusion may create colluders rather than reveal them. Acceptance rates are an upper bound on latent willingness, and the control (same visible $97 ask, no offer) separates the inducement from plain anchoring. This is strongest for deceptive offers (false consensus, false presupposition).

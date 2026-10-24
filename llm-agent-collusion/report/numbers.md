@@ -62,6 +62,14 @@ Mean real ask by hour (1 / 5 / 10 / 15):
 | v5 gpt-4.1 silent $97 vs. v4 silent $93 | +3.42 | < 0.0001 | +3.86 | < 0.0001 | 0.719 | — |
 | v5 gpt-4.1 gain $97 vs. silent $97 | -0.45 | 0.192 | -0.98 | 0.127 | 0.030 | — |
 
+## Coordination talk (coordination judge), fixed market
+
+- none: up 42/50, down 8/50
+- silent93: up 37/40, down 3/40
+- gain93: up 38/40, down 2/40
+- boss: no labels
+- cartel95: no labels
+
 ## Real sellers' median ask below the silent undercover seller (original market, gpt-4.1)
 
 - silent $93 (v4): $0.04

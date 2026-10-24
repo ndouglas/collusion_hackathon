@@ -235,6 +235,19 @@ def silent_colluders(control: list[Run], gain: list[Run]) -> list[str]:
     ]
 
 
+def coordination_counts(runs: list[Run]) -> str:
+    """Coordination judge: real sellers who talk about joint pricing, by direction."""
+    labels = []
+    for r in runs:
+        path = r.path / "coordination_labels.json"
+        if path.exists():
+            data = json.loads(path.read_text())
+            labels += [data[s] for s in r.real_ids if s in data]
+    up = sum(l.get("coordinates") and l.get("direction") == "up" for l in labels)
+    down = sum(l.get("coordinates") and l.get("direction") == "down" for l in labels)
+    return f"up {up}/{len(labels)}, down {down}/{len(labels)}" if labels else "no labels"
+
+
 def gap_below_undercover(runs: list[Run]) -> float:
     """Median of (undercover ask − real seller's ask) over rounds 2+: how far real sellers sit under the scripted seller."""
     gaps = [float(rd["seller_asks"][r.undercover_id]) - float(rd["seller_asks"][s])
@@ -351,6 +364,9 @@ def main() -> None:
             compare("v4 gpt-4.1 gain $93 vs. silent $93", v4["gain93"], v4["control93"]),
             compare("v5 gpt-4.1 silent $97 vs. v4 silent $93", v5["control97"], v4["control93"]),
             compare("v5 gpt-4.1 gain $97 vs. silent $97", v5["gain97"], v5["control97"]), ""]
+
+    out += ["## Coordination talk (coordination judge), fixed market", ""]
+    out += [f"- {k}: {coordination_counts(v6[k])}" for k in ("none", "silent93", "gain93", "boss", "cartel95")] + [""]
 
     out += ["## Real sellers' median ask below the silent undercover seller (original market, gpt-4.1)", "",
             f"- silent $93 (v4): ${gap_below_undercover(v4['control93']):.2f}",

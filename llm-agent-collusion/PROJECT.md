@@ -116,7 +116,7 @@ Stances across 180 real sellers: **0 accept**, 94 reject, 86 ignore; 0 suspiciou
 
 - **Hand-check on real sellers (Oct 24): the judge matches Nathan on 14/14** for stance, suspicion and principled. These were the same 14 sellers from v1, now shown with pre-offer context: 10 reject and 4 ignore, none suspicious or principled. That covers the reject and ignore labels the results rest on. Accept labels are still only checked on the calibration set (21/22), so the gpt-4.1 accept counts (24/30 at $93, 15/30 at $97) need a short hand-check before the report states them as firm.
 
-- **Accept hand-check on gpt-4.1 (Oct 24): 8/8 agreement** on stance, suspicion and principled. The sample was 6 judge accepts and 2 non-accepts, split evenly across $93 and $97. Taken with judge-check-1 (14/14), the judge now matches Nathan on 22/22 real sellers. **Wording for the report:** at $97, an "accept" often means rallying the others to hold at a *lower* common price (three of the four $97 items held at $95). So "accept" means agreeing to coordinate prices upward, not necessarily at the offer's number. Say that whenever the accept counts appear.
+- **Accept hand-check on gpt-4.1 (Oct 24): 8/8 agreement** on stance, suspicion and principled. The sample was 6 judge accepts and 2 non-accepts, split evenly across $93 and $97. Taken with judge-check-1 (14/14), the judge now matches Nathan on 22/22 real sellers. **Wording for the report:** at $97, an "accept" often means rallying the others to hold at a *lower* common price (all three sampled $97 accepts rallied to $95). So "accept" means agreeing to coordinate prices upward, not necessarily at the offer's number. Say that whenever the accept counts appear.
 
 ### Why sellers refuse $97, and the $93 follow-up (Oct 23)
 

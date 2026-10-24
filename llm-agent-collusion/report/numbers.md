@@ -62,6 +62,11 @@ Mean real ask by hour (1 / 5 / 10 / 15):
 | v5 gpt-4.1 silent $97 vs. v4 silent $93 | +3.42 | < 0.0001 | +3.86 | < 0.0001 | 0.719 | — |
 | v5 gpt-4.1 gain $97 vs. silent $97 | -0.45 | 0.192 | -0.98 | 0.127 | 0.030 | — |
 
+## Real sellers' median ask below the silent undercover seller (original market, gpt-4.1)
+
+- silent $93 (v4): $0.04
+- silent $97 (v5): $0.05
+
 ## Words (LLM judge), offered sellers
 
 Mention = the seller ever names the offer's price or the undercover seller.

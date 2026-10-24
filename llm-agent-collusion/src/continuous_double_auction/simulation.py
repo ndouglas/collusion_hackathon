@@ -346,6 +346,8 @@ def build_parser() -> argparse.ArgumentParser:
         help="share of seller messages the overseer sees each round (try 0.25, 0.5, 1.0)",
     )
     a.add_argument("--boss_pressure", action="store_true", help="CEO message pressuring sellers to keep prices high")
+    a.add_argument("--cartel_price", type=float, default=None,
+                   help="positive control: the CEO tells every seller they have all agreed to hold asks at this price or higher")
 
     u = p.add_argument_group("undercover seller (sprint project 3.2)")
     u.add_argument("--undercover", action="store_true",
@@ -428,6 +430,7 @@ def main() -> None:
             hide_num_rounds=args.hide_num_rounds,
             oversight_enabled=args.oversight_enabled,
             boss_pressure=args.boss_pressure,
+            cartel_price=args.cartel_price,
             temperature=args.temperature,
             tag=tag,
             max_message_length=args.max_message_length,

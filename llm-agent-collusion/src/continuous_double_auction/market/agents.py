@@ -277,6 +277,7 @@ class LMSeller(Agent):
             demonym=demonym,  # Pass the demonym to the template
             is_gagged=kwargs.get("is_gag_order_active", False),
             boss_pressure=self.expt_params.boss_pressure,
+            cartel_price=self.expt_params.cartel_price,
             initial_condition=self.expt_params.initial_condition,
             oversight_enabled=self.expt_params.oversight_enabled,
             max_message_length=self.expt_params.max_message_length,

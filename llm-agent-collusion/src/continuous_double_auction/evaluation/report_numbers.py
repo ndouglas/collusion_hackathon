@@ -96,7 +96,13 @@ def real_trades(run: Run) -> list[float]:
 
 
 def trade_price(run: Run) -> float:
-    return float(np.mean(real_trades(run)))
+    """Mean real-seller trade price; NaN for a run with no real trades (left out of price averages and tests)."""
+    trades = real_trades(run)
+    return float(np.mean(trades)) if trades else float("nan")
+
+
+def traded(values: list[float]) -> list[float]:
+    return [v for v in values if not math.isnan(v)]
 
 
 def undercover_trades(run: Run) -> int:
@@ -165,21 +171,24 @@ def fmt_p(p: float) -> str:
 # Report sections --------------------------------------------------------------------------------
 
 def arm_row(name: str, runs: list[Run]) -> str:
-    asks, trades = [mean_ask(r) for r in runs], [trade_price(r) for r in runs]
+    asks, trades = [mean_ask(r) for r in runs], traded([trade_price(r) for r in runs])
     n_trades = [len(real_trades(r)) for r in runs]
+    no_trade = len(runs) - len(trades)
+    note = f" ({no_trade} run{'s' if no_trade > 1 else ''} with no trades left out)" if no_trade else ""
     uc = sum(undercover_trades(r) for r in runs) if runs[0].undercover_id else "—"
     return (f"| {name} | {len(runs)} | ${np.mean(asks):.2f} (sd {np.std(asks, ddof=1):.2f}) | "
-            f"${np.mean(trades):.2f} (sd {np.std(trades, ddof=1):.2f}) | {np.mean(n_trades):.1f} | {uc} |")
+            f"${np.mean(trades):.2f} (sd {np.std(trades, ddof=1):.2f}){note} | {np.mean(n_trades):.1f} | {uc} |")
 
 
 def compare(name: str, a: list[Run], b: list[Run], with_mde: bool = False) -> str:
     da = np.mean([mean_ask(r) for r in a]) - np.mean([mean_ask(r) for r in b])
-    dt = np.mean([trade_price(r) for r in a]) - np.mean([trade_price(r) for r in b])
+    ta, tb = traded([trade_price(r) for r in a]), traded([trade_price(r) for r in b])
+    dt = np.mean(ta) - np.mean(tb)
     pa = permutation_p([mean_ask(r) for r in a], [mean_ask(r) for r in b])
-    pt = permutation_p([trade_price(r) for r in a], [trade_price(r) for r in b])
+    pt = permutation_p(ta, tb)
     pn = permutation_p([len(real_trades(r)) for r in a], [len(real_trades(r)) for r in b])
     extra = (f" | ${mde([mean_ask(r) for r in a], [mean_ask(r) for r in b]):.2f} / "
-             f"${mde([trade_price(r) for r in a], [trade_price(r) for r in b]):.2f}") if with_mde else " | —"
+             f"${mde(ta, tb):.2f}") if with_mde else " | —"
     return f"| {name} | {da:+.2f} | {fmt_p(pa)} | {dt:+.2f} | {fmt_p(pt)} | {fmt_p(pn)}{extra} |"
 
 
@@ -259,13 +268,13 @@ def plot_hourly(arms: dict[str, list[Run]], path: Path) -> None:
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    fig, ax = plt.subplots(figsize=(6, 3.5))
+    fig, ax = plt.subplots(figsize=(6, 4.2))
     top = 92.0
     for name, runs in arms.items():
         curves = np.array([hourly_asks(r) for r in runs])
         hours = np.arange(1, curves.shape[1] + 1)
         mean, se = np.nanmean(curves, 0), np.nanstd(curves, 0, ddof=1) / math.sqrt(len(curves))
-        ax.plot(hours, mean, marker="o", ms=3, label=name)
+        ax.plot(hours, mean, marker="o", ms=3, label=name.replace("$", r"\$"))
         ax.fill_between(hours, mean - se, mean + se, alpha=0.2)
         top = max(top, float(np.nanmax(mean + se)) + 1)
     ax.axhline(80, color="grey", ls=":", lw=1)
@@ -273,8 +282,8 @@ def plot_hourly(arms: dict[str, list[Run]], path: Path) -> None:
     ax.set_xlabel("hour")
     ax.set_ylabel("mean real-seller ask ($)")
     ax.set_ylim(79, top)
-    ax.legend(fontsize=8, loc="center right")
-    ax.set_title("Asks follow the opening book, with or without chat", fontsize=10)
+    ax.legend(fontsize=7.5, loc="upper center", bbox_to_anchor=(0.5, -0.18), ncol=2, frameon=False)
+    ax.set_title("Asks stay at the opening book unless sellers are told they have agreed", fontsize=10)
     fig.tight_layout()
     fig.savefig(path, dpi=200)
     fig.savefig(path.with_suffix(".pdf"))
@@ -282,7 +291,7 @@ def plot_hourly(arms: dict[str, list[Run]], path: Path) -> None:
 
 def main() -> None:
     OUT.mkdir(exist_ok=True)
-    v6 = {k: load_runs(f"v6-{k}") for k in ("none", "silent93", "gain93", "nochat", "nochat85", "boss")}
+    v6 = {k: load_runs(f"v6-{k}") for k in ("none", "silent93", "gain93", "nochat", "nochat85", "boss", "cartel95")}
     v1 = {"control": load_runs("v1-control", range(20)), "gain": load_runs("v1-gain"), "loss": load_runs("v1-loss")}
     v2 = {"signal-gain": load_runs("v2-signal-gain"), "signal-loss": load_runs("v2-signal-loss")}
     v3 = {"control93": load_runs("v3-control93"), "control93-first20": load_runs("v3-control93", range(20)),
@@ -299,6 +308,8 @@ def main() -> None:
             arm_row("no chat, open $85", v6["nochat85"])]
     if v6["boss"]:
         out += [arm_row("positive control: chat + CEO pressure, open $90", v6["boss"])]
+    if v6["cartel95"]:
+        out += [arm_row("positive control: chat + agreed cartel at $95, open $90", v6["cartel95"])]
     out += [""]
     out += ["## Fixed market (v6): tests", "", COMPARE_HEADER,
             compare("opening book: no chat $85 vs. no chat $90", v6["nochat85"], v6["nochat"]),
@@ -308,6 +319,8 @@ def main() -> None:
             compare("$93 offer vs. no undercover", v6["gain93"], v6["none"], with_mde=True)]
     if v6["boss"]:
         out += [compare("positive control: CEO pressure vs. chat $90", v6["boss"], v6["none"])]
+    if v6["cartel95"]:
+        out += [compare("positive control: agreed cartel $95 vs. chat $90", v6["cartel95"], v6["none"])]
     out += [""]
     hours = {k: np.nanmean([hourly_asks(r) for r in v6[k]], axis=0) for k in ("nochat85", "nochat", "none")}
     out += ["Mean real ask by hour (1 / 5 / 10 / 15):", ""]
@@ -349,6 +362,8 @@ def main() -> None:
     curves = {"chat, open $90": v6["none"], "no chat, open $90": v6["nochat"], "no chat, open $85": v6["nochat85"]}
     if v6["boss"]:
         curves["positive control (CEO pressure), open $90"] = v6["boss"]
+    if v6["cartel95"]:
+        curves["positive control (agreed cartel at $95), open $90"] = v6["cartel95"]
     plot_hourly(curves,
                 OUT / "hourly_asks.png")
     out += ["## Figure", "", "![Mean real-seller ask by hour](hourly_asks.png)", ""]

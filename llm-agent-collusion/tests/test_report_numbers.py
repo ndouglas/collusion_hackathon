@@ -1,4 +1,7 @@
-from src.continuous_double_auction.evaluation.report_numbers import fisher_p, mde, permutation_p
+import json
+
+from src.continuous_double_auction.evaluation import report_numbers
+from src.continuous_double_auction.evaluation.report_numbers import Run, fisher_p, mde, mentions_offer, permutation_p
 
 
 def test_permutation_p_is_large_for_identical_groups_and_small_for_separated_ones():
@@ -15,3 +18,26 @@ def test_mde_shrinks_with_more_runs():
     small = mde([1.0, 2.0, 3.0, 4.0], [1.0, 2.0, 3.0, 4.0])
     large = mde([1.0, 2.0, 3.0, 4.0] * 4, [1.0, 2.0, 3.0, 4.0] * 4)
     assert large < small
+
+
+def test_load_runs_takes_the_seed_from_the_config_and_keeps_a_run_saved_without_a_seed_suffix(tmp_path, monkeypatch):
+    for name, seed in [("20261023_091414_v1-control-seed0", 0), ("20261023_092517_v1-control", 9),
+                       ("20261023_091414_v1-control93-seed1", 1)]:
+        d = tmp_path / name
+        d.mkdir()
+        (d / "experiment_metadata.json").write_text(json.dumps({"auction_config": {"seed": seed}}))
+        (d / "auction_results.md").write_text("")
+    monkeypatch.setattr(report_numbers, "RESULTS", tmp_path)
+    assert [r.seed for r in report_numbers.load_runs("v1-control")] == [0, 9]
+    assert [r.seed for r in report_numbers.load_runs("v1-control", range(5))] == [0]
+
+
+def test_mentions_offer_counts_a_price_ending_a_sentence_but_not_before_the_offer_is_seen():
+    def run(messages: dict[int, str]) -> Run:
+        rounds = [{"round_number": h, "seller_messages": {"Seller Jin": messages.get(h, "")}} for h in range(1, 4)]
+        return Run(path=None, tag="t", seed=0, config={"undercover_ask": 93.0, "undercover_message": "hold"},
+                   undercover_id="Seller Wei", rounds=rounds)
+    assert mentions_offer(run({2: "Let's avoid undercutting below $93."}), "Seller Jin")
+    assert not mentions_offer(run({1: "Hold above $93."}), "Seller Jin")
+    assert not mentions_offer(run({2: "I'll ask $88.93 this hour."}), "Seller Jin")
+    assert not mentions_offer(run({2: "I'll ask $93.50 this hour."}), "Seller Jin")

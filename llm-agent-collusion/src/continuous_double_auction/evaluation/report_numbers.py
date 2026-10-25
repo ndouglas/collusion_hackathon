@@ -295,6 +295,11 @@ def defection_share(run: Run, cartel: float = 95.0) -> float:
     return float(np.mean([min(seller_asks(run, s, first_round=1)) < cartel - 1 for s in run.real_ids]))
 
 
+def first_trade_hour(run: Run) -> int | None:
+    return next((rd["round_number"] for rd in run.rounds
+                 if any(t["seller_id"] != run.undercover_id for t in rd["trades"])), None)
+
+
 def first_hour_defection_share(run: Run, cartel: float = 95.0) -> float:
     return float(np.mean([seller_asks(run, s, first_round=1)[0] < cartel - 1 for s in run.real_ids]))
 
@@ -518,6 +523,9 @@ def main() -> None:
             out += [f"- {k}: {cartel_defection(runs)}",
                     f"- run-level share of sellers defecting, {k} vs. cartel: p = "
                     f"{fmt_p(permutation_p([defection_share(r) for r in runs], [defection_share(r) for r in v6['cartel95']]))}"]
+        out += ["", "First hour with a real trade, by run (seeds 0-9; — = none):", ""]
+        for k, runs in [("cartel", v6["cartel95"]), *ct.items()]:
+            out += [f"- {k}: " + ", ".join(str(first_trade_hour(r) or "—") for r in runs)]
         out += ["", "Mean real ask by hour (1 / 2 / 3 / 5 / 10 / 15):", ""]
         for k, runs in ct.items():
             h = np.nanmean([hourly_asks(r) for r in runs], axis=0)

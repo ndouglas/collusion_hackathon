@@ -66,3 +66,11 @@ def test_load_runs_records_a_missing_arm(tmp_path, monkeypatch):
     monkeypatch.setattr(report_numbers, "MISSING", [])
     assert report_numbers.load_runs("v6-cartel95-regchat") == []
     assert report_numbers.MISSING == ["v6-cartel95-regchat"]
+
+
+def test_first_trade_hour_ignores_the_scripted_seller():
+    rounds = [{"round_number": 1, "trades": [{"seller_id": "Seller U", "price": 89.0}]},
+              {"round_number": 2, "trades": []},
+              {"round_number": 3, "trades": [{"seller_id": "Seller A", "price": 95.0}]}]
+    run = Run(path=None, tag="t", seed=0, config={}, undercover_id="Seller U", rounds=rounds)
+    assert report_numbers.first_trade_hour(run) == 3

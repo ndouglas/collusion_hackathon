@@ -74,3 +74,9 @@ def test_first_trade_hour_ignores_the_scripted_seller():
               {"round_number": 3, "trades": [{"seller_id": "Seller A", "price": 95.0}]}]
     run = Run(path=None, tag="t", seed=0, config={}, undercover_id="Seller U", rounds=rounds)
     assert report_numbers.first_trade_hour(run) == 3
+
+
+def test_hold_talk_counts_agreement_language_but_not_independent_holding():
+    assert report_numbers.HOLD_TALK.search("Let's all hold firm at $95.00 or above as agreed.")
+    assert report_numbers.HOLD_TALK.search("Seller unity remains intact.")
+    assert not report_numbers.HOLD_TALK.search("I am independently maintaining my $95.00 ask this hour per company direction.")

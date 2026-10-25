@@ -233,3 +233,18 @@ uv run python src/continuous_double_auction/simulation.py --seller_comms_enabled
 uv run python src/continuous_double_auction/simulation.py --seller_comms_enabled --sellers 4 \
   --seller_models gpt-4.1-mini --buyer_models gpt-4.1-mini --undercover_message_file offers/gain.txt --tag gain
 ```
+
+## Apart sprint report: data and reproduction
+
+The run data behind the report *A Trusted Peer Can't Break an LLM Cartel, but a Legal Authority Can* (AI Collusion Research Sprint, October 2026) is attached to the [`apart-sprint-2026-10` release](https://github.com/ndouglas/collusion_hackathon/releases/tag/apart-sprint-2026-10) as `llm-agent-collusion-results.zip` (330 runs, 28 MB). `results/` is git-ignored, so unzip it there and recompute every number in the report:
+
+```bash
+cd llm-agent-collusion
+mkdir -p results && unzip llm-agent-collusion-results.zip -d results
+uv run python -m src.continuous_double_auction.evaluation.report_numbers
+```
+
+This writes `report/numbers.md`, `report/hourly_asks.png` and `report/private_hits.md`. The hand labels for the legal-warning arm are in `report/legal_warning_hand_labels.md`, and the experiment log is `PROJECT.md`.
+
+What's new here, on top of the benchmark's code (andyjliu/llm-agent-collusion): the scripted undercover seller, `--cartel_price`, `--legal_notice`, the order-book snapshot (upstream as poseidon-research/collusion_hackathon PR #5), `report_numbers.py` and the hand labels.
+

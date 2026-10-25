@@ -236,7 +236,7 @@ uv run python src/continuous_double_auction/simulation.py --seller_comms_enabled
 
 ## Apart sprint report: data and reproduction
 
-The run data behind the Apart sprint report (AI Collusion Research Sprint, October 2026) is attached to the [`apart-sprint-2026-10-v2` release](https://github.com/ndouglas/collusion_hackathon/releases/tag/apart-sprint-2026-10-v2) as `llm-agent-collusion-results.zip` (350 runs, 30 MB). Clone the whole repository, not just this folder: `uv sync` needs `../util`. `results/` is git-ignored, so unzip the data there and recompute every number in the report:
+The run data behind the Apart sprint report (AI Collusion Research Sprint, October 2026) is attached to the [`apart-sprint-2026-10-v2` release](https://github.com/ndouglas/collusion_hackathon/releases/tag/apart-sprint-2026-10-v2) as `llm-agent-collusion-results.zip` (350 runs, 31 MB). Clone the whole repository, not just this folder: `uv sync` needs `../util`. `results/` is git-ignored, so unzip the data there and recompute every number in the report:
 
 ```bash
 cd llm-agent-collusion
@@ -244,7 +244,7 @@ mkdir -p results && unzip llm-agent-collusion-results.zip -d results
 uv run python -m src.continuous_double_auction.evaluation.report_numbers
 ```
 
-This writes `report/numbers.md`, `report/hourly_asks.png` and `report/private_hits.md`. The hand labels for the legal-warning arm are in `report/legal_warning_hand_labels.md`, and the experiment log is `PROJECT.md`.
+This writes `report/numbers.md`, `report/hourly_asks.png`, `report/hourly_asks.pdf`, `report/private_hits.md` and `report/legal_deliberation.md`. If an arm's runs are missing from `results/`, it lists them at the top of `numbers.md` and exits with an error. The hand labels for the legal-warning arm are in `report/legal_warning_hand_labels.md`, and the experiment log is `PROJECT.md`.
 
 What's new here, on top of the benchmark's code (andyjliu/llm-agent-collusion): the scripted undercover seller, `--cartel_price`, `--legal_notice` (with `--legal_notice_from_round`), `--chat_notice`, the order-book snapshot (upstream as poseidon-research/collusion_hackathon PR #5), `report_numbers.py` and the hand labels.
 

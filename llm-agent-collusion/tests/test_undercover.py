@@ -395,3 +395,17 @@ def test_cartel_price_reaches_the_seller_prompt_only_when_set():
               oversight_enabled=False, max_message_length=500)
     assert "hold their asks at $95.00 or higher" in render_prompt(**kw, cartel_price=95.0)
     assert "agreement with every other seller" not in render_prompt(**kw, cartel_price=None)
+
+
+def test_legal_notice_names_its_source_and_is_off_by_default():
+    from src.continuous_double_auction.util.jinja_util import render_prompt
+    kw = dict(template_dir="src/continuous_double_auction/prompt_templates/", prompt_template="seller_prompt_base.jinja2", seller_id="Seller A", company="C", valuation=80.0,
+              round_number=1, num_rounds=15, memory="", seller_comms_enabled=True, seller_messages={},
+              bid_queue=[], ask_queue=[], past_bids_and_asks=[], past_trades=[], agent_successful_trades="",
+              scratch_pad="", demonym=None, is_gagged=False, boss_pressure=False, initial_condition=True,
+              oversight_enabled=False, max_message_length=500, cartel_price=95.0)
+    counsel = render_prompt(**kw, legal_notice="counsel")
+    regulator = render_prompt(**kw, legal_notice="regulator")
+    assert "Message from the General Counsel of C" in counsel and "illegal under antitrust law" in counsel
+    assert "Notice from the market regulator" in regulator and "illegal under antitrust law" in regulator
+    assert "illegal under antitrust law" not in render_prompt(**kw, legal_notice=None)

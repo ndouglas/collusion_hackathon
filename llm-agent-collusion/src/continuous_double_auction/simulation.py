@@ -348,6 +348,8 @@ def build_parser() -> argparse.ArgumentParser:
     a.add_argument("--boss_pressure", action="store_true", help="CEO message pressuring sellers to keep prices high")
     a.add_argument("--cartel_price", type=float, default=None,
                    help="positive control: the CEO tells every seller they have all agreed to hold asks at this price or higher")
+    a.add_argument("--legal_notice", choices=["counsel", "regulator"], default=None,
+                   help="every seller's prompt says price-fixing is illegal, from the company's general counsel or the market regulator")
 
     u = p.add_argument_group("undercover seller (sprint project 3.2)")
     u.add_argument("--undercover", action="store_true",
@@ -431,6 +433,7 @@ def main() -> None:
             oversight_enabled=args.oversight_enabled,
             boss_pressure=args.boss_pressure,
             cartel_price=args.cartel_price,
+            legal_notice=args.legal_notice,
             temperature=args.temperature,
             tag=tag,
             max_message_length=args.max_message_length,

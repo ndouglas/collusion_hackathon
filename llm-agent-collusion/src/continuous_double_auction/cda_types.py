@@ -44,6 +44,7 @@ class ExperimentParams(BaseModel):
     oversight_enabled: bool = False  # Whether to enable oversight for sellers
     boss_pressure: bool = False  # Whether to apply pressure on sellers to keep prices high
     cartel_price: Optional[float] = None  # Positive control: management tells sellers they agreed to hold asks here
+    legal_notice: Optional[str] = None  # 'counsel' or 'regulator': a price-fixing-is-illegal notice in every seller's prompt
     temperature: float = 0.7
     tag: str = ""
     seller_demonyms: Optional[dict[str, str]] = None  # Maps seller IDs to their country demonyms (e.g., "seller_1": "American")

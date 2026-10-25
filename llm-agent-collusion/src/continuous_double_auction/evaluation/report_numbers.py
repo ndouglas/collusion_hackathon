@@ -406,6 +406,29 @@ def main() -> None:
         out += ["", "Public legal or reporting words in real sellers' chat (keyword, no LLM):", ""]
         out += [f"- {k}: {public_legal_mentions(cd[k])}" for k in cd] + [""]
 
+    # Authority warnings (Oct 25): the $95 cartel market (5 real sellers) with a price-fixing-is-illegal notice in every
+    # seller's prompt, from the company's general counsel or from the market regulator.
+    aw = {k: load_runs(f"v6-cartel95-{k}") for k in ("counsel", "regulator")}
+    if all(aw.values()):
+        out += ["## Authority warnings: arms", "", "Agreed cartel at $95, 5 real sellers, plus a legal notice in every seller's prompt (10 seeds).", "",
+                ARM_HEADER,
+                arm_row("agreed cartel at $95 (reference)", v6["cartel95"]),
+                arm_row("+ general counsel: price-fixing is illegal", aw["counsel"]),
+                arm_row("+ market regulator: price-fixing is illegal", aw["regulator"]), ""]
+        out += ["## Authority warnings: tests", "", COMPARE_HEADER,
+                compare("general counsel vs. cartel", aw["counsel"], v6["cartel95"], with_mde=True),
+                compare("regulator vs. cartel", aw["regulator"], v6["cartel95"], with_mde=True),
+                compare("regulator vs. general counsel", aw["regulator"], aw["counsel"], with_mde=True), ""]
+        out += ["Defection (real seller asks more than $1 under $95 at any hour):", ""]
+        out += [f"- {name}: {cartel_defection(runs)}" for name, runs in [("cartel", v6["cartel95"]), *aw.items()]]
+        out += [f"- run-level share of sellers defecting, {k} vs. cartel: p = "
+                f"{fmt_p(permutation_p([defection_share(r) for r in aw[k]], [defection_share(r) for r in v6['cartel95']]))}" for k in aw]
+        ah = {k: np.nanmean([hourly_asks(r) for r in runs], axis=0) for k, runs in [("cartel", v6["cartel95"]), *aw.items()]}
+        out += ["", "Mean real ask by hour (1 / 5 / 10 / 15):", ""]
+        out += [f"- {k}: " + " / ".join(f"${ah[k][h - 1]:.2f}" for h in (1, 5, 10, 15)) for k in ah]
+        out += ["", "Public legal or reporting words in real sellers' chat (keyword, no LLM):", ""]
+        out += [f"- {k}: {public_legal_mentions(runs)}" for k, runs in [("cartel", v6["cartel95"]), *aw.items()]] + [""]
+
     out += ["## Original market: arms", "", ARM_HEADER,
             arm_row("v1 mini, silent $97 (seeds 0-19)", v1["control"]), arm_row("v1 mini, silent $97 (seeds 0-39)", v1_all_controls),
             arm_row("v1 mini, gain $97", v1["gain"]), arm_row("v1 mini, loss $97", v1["loss"]),

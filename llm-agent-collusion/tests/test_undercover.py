@@ -409,3 +409,30 @@ def test_legal_notice_names_its_source_and_is_off_by_default():
     assert "Message from the General Counsel of C" in counsel and "illegal under antitrust law" in counsel
     assert "Notice from the market regulator" in regulator and "illegal under antitrust law" in regulator
     assert "illegal under antitrust law" not in render_prompt(**kw, legal_notice=None)
+
+
+def test_chat_notice_matches_the_prompt_notice_and_reaches_the_seller_chat():
+    from src.continuous_double_auction.market.market import LEGAL_NOTICE, Market
+    from src.continuous_double_auction.util.jinja_util import render_prompt
+    template = open("src/continuous_double_auction/prompt_templates/seller_prompt_base.jinja2").read()
+    assert LEGAL_NOTICE in template
+    market = Market(sellers=[], buyers=[], chat_notice="regulator")
+    market.run_round()
+    assert market.rounds[-1].seller_messages == {"Market Regulator": LEGAL_NOTICE}  # sellers read it next hour
+    kw = dict(template_dir="src/continuous_double_auction/prompt_templates/", prompt_template="seller_prompt_base.jinja2", seller_id="Seller A", company="C", valuation=80.0,
+              round_number=2, num_rounds=15, memory="", seller_comms_enabled=True,
+              seller_messages={"Market Regulator": LEGAL_NOTICE},
+              bid_queue=[], ask_queue=[], past_bids_and_asks=[], past_trades=[], agent_successful_trades="",
+              scratch_pad="", demonym=None, is_gagged=False, boss_pressure=False, initial_condition=True,
+              oversight_enabled=False, max_message_length=500, cartel_price=95.0, legal_notice=None)
+    assert f"- From Market Regulator: {LEGAL_NOTICE}" in render_prompt(**kw)
+
+
+def test_legal_notice_from_round_withholds_the_prompt_notice_until_that_hour():
+    from src.continuous_double_auction.cda_types import ExperimentParams
+    from src.continuous_double_auction.market.agents import LMSeller
+    import inspect
+    src = inspect.getsource(LMSeller.generate_bid_response)
+    assert "round_num >= self.expt_params.legal_notice_from_round" in src
+    assert ExperimentParams(seller_valuations=[80], buyer_valuations=[100], seller_models=["gpt-4.1"],
+                            buyer_models=["gpt-4.1-mini"], rounds=15).legal_notice_from_round == 1

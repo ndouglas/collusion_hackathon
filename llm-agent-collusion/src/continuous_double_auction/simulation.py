@@ -158,6 +158,7 @@ def run_simulation(params: ExperimentParams, log_dir: Optional[str] = None, use_
         overseer=overseer,
         overseer_sample_fraction=params.overseer_sample_fraction,
         overseer_rng=random.Random(params.seed) if params.seed is not None else None,
+        chat_notice=params.chat_notice,
     )
 
     if params.initial_condition:
@@ -350,6 +351,10 @@ def build_parser() -> argparse.ArgumentParser:
                    help="positive control: the CEO tells every seller they have all agreed to hold asks at this price or higher")
     a.add_argument("--legal_notice", choices=["counsel", "regulator"], default=None,
                    help="every seller's prompt says price-fixing is illegal, from the company's general counsel or the market regulator")
+    a.add_argument("--legal_notice_from_round", type=int, default=1,
+                   help="the prompt notice appears from this hour on (default 1)")
+    a.add_argument("--chat_notice", choices=["regulator"], default=None,
+                   help="the market regulator posts the legal notice in the seller chat every hour (seen from hour 2)")
 
     u = p.add_argument_group("undercover seller (sprint project 3.2)")
     u.add_argument("--undercover", action="store_true",
@@ -388,6 +393,8 @@ def main() -> None:
         args.undercover_message = Path(args.undercover_message_file).read_text().strip()
     if args.undercover_message:
         args.undercover = True
+    if args.chat_notice and not args.seller_comms_enabled:
+        sys.exit("❌ --chat_notice needs --seller_comms_enabled (it travels over seller chat)")
     if args.undercover and not args.seller_comms_enabled:
         sys.exit("❌ --undercover needs --seller_comms_enabled (its offer travels over seller chat)")
     if args.undercover and args.sellers < 2:
@@ -434,6 +441,8 @@ def main() -> None:
             boss_pressure=args.boss_pressure,
             cartel_price=args.cartel_price,
             legal_notice=args.legal_notice,
+            legal_notice_from_round=args.legal_notice_from_round,
+            chat_notice=args.chat_notice,
             temperature=args.temperature,
             tag=tag,
             max_message_length=args.max_message_length,

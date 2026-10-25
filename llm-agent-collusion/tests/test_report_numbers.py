@@ -41,3 +41,28 @@ def test_mentions_offer_counts_a_price_ending_a_sentence_but_not_before_the_offe
     assert not mentions_offer(run({1: "Hold above $93."}), "Seller Jin")
     assert not mentions_offer(run({2: "I'll ask $88.93 this hour."}), "Seller Jin")
     assert not mentions_offer(run({2: "I'll ask $93.50 this hour."}), "Seller Jin")
+
+
+def _cartel_run(asks: dict[str, list[float]], messages: dict[str, str] | None = None) -> Run:
+    rounds = [{"round_number": h + 1, "seller_asks": {s: a[h] for s, a in asks.items()},
+               "seller_messages": dict(messages or {})} for h in range(len(next(iter(asks.values()))))]
+    return Run(path=None, tag="t", seed=0, config={}, undercover_id=None, rounds=rounds)
+
+
+def test_reporting_words_are_not_counted_as_legal_words():
+    run = _cartel_run({"Seller A": [95.0], "Seller B": [95.0]},
+                      {"Seller A": "Please report any changes in buyer behavior.", "Seller B": "Price-fixing is illegal."})
+    assert report_numbers.public_legal_mentions([run]) == "legal words 1/2 real sellers; reporting words 1/2"
+
+
+def test_first_hour_defection_share_looks_only_at_hour_one():
+    run = _cartel_run({"Seller A": [90.0, 95.0], "Seller B": [95.0, 90.0]})
+    assert report_numbers.first_hour_defection_share(run) == 0.5
+    assert report_numbers.defection_share(run) == 1.0
+
+
+def test_load_runs_records_a_missing_arm(tmp_path, monkeypatch):
+    monkeypatch.setattr(report_numbers, "RESULTS", tmp_path)
+    monkeypatch.setattr(report_numbers, "MISSING", [])
+    assert report_numbers.load_runs("v6-cartel95-regchat") == []
+    assert report_numbers.MISSING == ["v6-cartel95-regchat"]

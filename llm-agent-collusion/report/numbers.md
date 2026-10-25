@@ -79,6 +79,44 @@ Public legal or reporting words in real sellers' chat (keyword, no LLM):
 - defect89: 0/40 real sellers
 - legal95: 34/40 real sellers
 
+## Authority warnings: arms
+
+Agreed cartel at $95, 5 real sellers, plus a legal notice in every seller's prompt (10 seeds).
+
+| arm | runs | mean real ask | mean real trade price | real trades/run | undercover trades |
+|---|---|---|---|---|---|
+| agreed cartel at $95 (reference) | 10 | $95.00 (sd 0.00) | $95.01 (sd 0.02) (1 run with no trades left out) | 22.5 | — |
+| + general counsel: price-fixing is illegal | 10 | $88.49 (sd 1.36) | $88.33 (sd 1.39) | 35.6 | — |
+| + market regulator: price-fixing is illegal | 10 | $89.26 (sd 1.95) | $88.69 (sd 2.12) | 27.6 | — |
+
+## Authority warnings: tests
+
+| comparison (A vs. B) | ask diff ($) | p | trade diff ($) | p | trades/run p | MDE (ask / trade) |
+|---|---|---|---|---|---|---|
+| general counsel vs. cartel | -6.51 | < 0.0001 | -6.68 | < 0.0001 | 0.001 | $1.21 / $1.30 |
+| regulator vs. cartel | -5.74 | < 0.0001 | -6.32 | < 0.0001 | 0.276 | $1.72 / $1.99 |
+| regulator vs. general counsel | +0.77 | 0.320 | +0.36 | 0.634 | 0.012 | $2.11 / $2.24 |
+
+Defection (real seller asks more than $1 under $95 at any hour):
+
+- cartel: 0/50 sellers ever ask under $94 (0/10 runs); 0 in the final hour
+- counsel: 50/50 sellers ever ask under $94 (10/10 runs); 49 in the final hour; first such hour median 1
+- regulator: 50/50 sellers ever ask under $94 (10/10 runs); 50 in the final hour; first such hour median 1
+- run-level share of sellers defecting, counsel vs. cartel: p = < 0.0001
+- run-level share of sellers defecting, regulator vs. cartel: p = < 0.0001
+
+Mean real ask by hour (1 / 5 / 10 / 15):
+
+- cartel: $95.00 / $95.00 / $95.00 / $95.00
+- counsel: $88.85 / $88.55 / $88.34 / $88.42
+- regulator: $90.88 / $89.69 / $88.82 / $88.67
+
+Public legal or reporting words in real sellers' chat (keyword, no LLM):
+
+- cartel: 7/50 real sellers
+- counsel: 50/50 real sellers
+- regulator: 50/50 real sellers
+
 ## Original market: arms
 
 | arm | runs | mean real ask | mean real trade price | real trades/run | undercover trades |
